@@ -1,9 +1,9 @@
-require('dotenv').config();
 const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
 const helmet = require('helmet');
 const { NODE_ENV, CLIENT_ORIGIN } = require('./config');
+const journalsRouter = require('./journals/journals-router');
 
 const app = express();
 
@@ -16,13 +16,7 @@ app.use(
     })
 );
 
-app.get('/api/*', (req, res) => {
-    res.json({ok: true});
-});
-
-app.get('/', (req, res) => {
-    res.send('Hello, world!');
-});
+app.use('/api/journals', journalsRouter);
 
 app.use(function errorHandler(error, req, res, next) {
     let response;
