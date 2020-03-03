@@ -2,28 +2,28 @@ function makeTestUsers() {
     return [
         {   
             id: 1,
-            fullName: "John Doe",
+            full_name: "John Doe",
             email: "example@mail.com",
             password: "password",
             date_created: new Date('2020-01-22T16:28:32.615Z'),
         },
         {
             id: 2,
-            fullName: "Jane Lane",
+            full_name: "Jane Lane",
             email: "jl3le@mail.com",
             password: "password1",
             date_created: new Date('2020-01-22T16:28:32.615Z'),
         },
         {
             id: 3,
-            fullName: "Bob Roe",
+            full_name: "Bob Roe",
             email: "bos0i8e@mail.com",
             password: "password2",
             date_created: new Date('2020-01-22T16:28:32.615Z'),
         },
         {
             id: 4,
-            fullName: "Luke Sky",
+            full_name: "Luke Sky",
             email: "skywalker2@mail.com",
             password: "password4orce",
             date_created: new Date('2020-01-22T16:28:32.615Z'),
@@ -38,8 +38,8 @@ function makeTestJournals(users) {
             title: "Spanish Delight",
             location: "Madrid, Spain",
             content: "Lorem ipsum dolor sit amet, deserunt mollit anim id est laborum.",
-            start_date: "Wed Jun 05 2019 20:00:00",
-            end_date: "Thu Jun 06 2019 20:00:00",
+            start_date: new Date('Wed Jun 05 2019 20:00:00'),
+            end_date: new Date('Thu Jun 06 2019 20:00:00'),
             date_created: new Date('2020-01-22T16:28:32.615Z'),
             author_id: users[0].id
         },
@@ -48,8 +48,8 @@ function makeTestJournals(users) {
             title: "Fun Day in Florida",
             location: "Miami, Florida",
             content: "Lorem ipsum dolor sit amet, deserunt mollit anim id est laborum.",
-            start_date: "Fri Jan 11 2019 19:00:00",
-            end_date: "Fri Jan 12 2019 19:00:00",
+            start_date: new Date('Fri Jan 11 2019 19:00:00'),
+            end_date: new Date('Fri Jan 12 2019 19:00:00'),
             date_created: new Date('2020-01-22T16:28:32.615Z'),
             author_id: users[0].id
         },
@@ -58,8 +58,8 @@ function makeTestJournals(users) {
             title: "Beauty of Italy",
             location: "Rome, Italy",
             content: "Lorem ipsum dolor sit amet, deserunt mollit anim id est laborum.",
-            start_date: "Mon Feb 10 2020 12:00:00",
-            end_date: "Fri Feb 14 2020 12:00:00",
+            start_date: new Date('Mon Feb 10 2020 12:00:00'),
+            end_date: new Date('Fri Feb 14 2020 12:00:00'),
             date_created: new Date('2020-01-22T16:28:32.615Z'),
             author_id: users[3].id
         },
@@ -68,8 +68,8 @@ function makeTestJournals(users) {
             title: "Disney World",
             location: "Orlando, Florida",
             content: "Lorem ipsum dolor sit amet, deserunt mollit anim id est laborum.",
-            start_date: "Tue Jul 02 2019 20:00:00",
-            end_date: "Tue Jul 09 2019 20:00:00",
+            start_date: new Date('Tue Jul 02 2019 20:00:00'),
+            end_date: new Date('Tue Jul 09 2019 20:00:00'),
             date_created: new Date('2020-01-22T16:28:32.615Z'),
             author_id: users[2].id
         },
@@ -78,8 +78,8 @@ function makeTestJournals(users) {
             title: "First day in Australia",
             location: "Brisbane, Australia",
             content: "Lorem ipsum dolor sit amet, deserunt mollit anim id est laborum.",
-            start_date: "Sun Apr 14 2019 20:00:00",
-            end_date: "Mon Apr 15 2019 20:00:00",
+            start_date: new Date('Sun Apr 14 2019 20:00:00'),
+            end_date: new Date('Mon Apr 15 2019 20:00:00'),
             date_created: new Date('2020-01-22T16:28:32.615Z'),
             author_id: users[1].id
         },
@@ -149,7 +149,7 @@ function seedTravelingJournalsTables(db, users, journals, comments=[]) {
 
 function makeExpectedJournal(users, journal, comments=[]) {
     const author = users.find(user => user.id === journal.author_id);
-    const number_of_comments = comments.filter(comment => comment.journal_id === journal_id).length;
+    const number_of_comments = comments.filter(comment => comment.journal_id === journal.id).length;
 
     return {
         id: journal.id,
@@ -157,11 +157,37 @@ function makeExpectedJournal(users, journal, comments=[]) {
         location: journal.location,
         content: journal.content,
         date_created: journal.date_created.toISOString(),
+        date_modified: journal.date_modified || null,
         start_date: journal.start_date.toISOString(),
         end_date: journal.end_date.toISOString(),
-        number_of_comments,
-        author
+        number_of_comments: Number(number_of_comments),
+        author: author.full_name
     };
+};
+
+function makeExpectedJournalComments(users, journalId, comments) {
+    const expectedComments = comments.filter(comment => comment.journal_id === journalId)
+
+    return expectedComments.map(comment => {
+        const commentUser = users.find(user => user.id === comment.author_id)
+        return {
+            id: commentUser.id,
+            text: commentUser.text,
+            date_created: commentUser.date_created.toISOString(),
+            journal_id: commentUser.journal_id,
+            author: author.full_name
+        }
+    });
+};
+
+function seedUsers(db, users) {
+    return db.into('traveling_users').insert(users)
+        .then(() => 
+            db.raw(
+                `SELECT setval('traveling_users_id_seq', ?)`,
+                [users[users.length - 1].id]
+            )
+        )
 };
 
 module.exports = {
@@ -170,5 +196,7 @@ module.exports = {
     makeTestComments,
     makeJournalsFixtures,
     seedTravelingJournalsTables,
-    makeExpectedJournal
+    makeExpectedJournal,
+    makeExpectedJournalComments,
+    seedUsers
 };

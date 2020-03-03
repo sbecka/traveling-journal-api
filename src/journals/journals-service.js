@@ -30,24 +30,75 @@ const JournalsService = {
             )
             .groupBy('j.id', 'usr.id')
     },
-    // createJournal() {
-        // create journal
-    // },
+    createJournal(db, newJournal) {
+        return db
+            .insert(newJournal)
+            .into('traveling_journals')
+            .returning('*')
+            .then(rows => {
+                return rows[0]
+            })
+    },
     getById(db, id) {
         return JournalsService.getAllJournals(db)
             .where('j.id', id)
             .first()
     },
-    // getCommentsForJournal() {
-        // get comments for one journal
-    // },
-    // deleteJournal() {
-        // delete journal
-    // },
-    // updateJournal() {
-        // edit and update one journal
-    // }
+    getCommentsForJournal(db, journal_id) {
+        return db
+            .from('traveling_comments AS com')
+            .select(
+                'com.id',
+                'com.text',
+                'com.date_created',
+                'usr.full_name AS author',
+            )
+            .where('com.journal_id', journal_id)
+            .leftJoin(
+                'traveling_users AS usr',
+                'com.author_id',
+                'usr.id'
+            )
+            .groupBy('com.id', 'usr.id')
+    },
+    deleteJournal(db, id) {
+        return db
+            .from('traveling_journals')
+            .where({ id })
+            .delete()
+    },
+    updateJournal(db, id, newJournalFields) {
+        return db
+            .from('traveling_journals')
+            .where({ id })
+            .update(newJournalFields)
+    },
+    serializeJournal(journal) {
+        return {
+            id: journal.id,
+            title: xss(journal.title),
+            location: xss(journal.location),
+            content: xss(journal.content),
+            start_date: new Date(journal.start_date),
+            end_date: new Date(journal.end_date),
+            date_created: new Date(journal.date_created),
+            date_modified: journal.date_modified || null,
+            number_of_comments: Number(journal.number_of_comments),
+            author: journal.author
+        }
+    },
+    serializeJournalComment(comment) {
+        return {
+            id: comment.id,
+            text: xss(comment.text),
+            date_created: new Date(comment.date_created),
+            journal_id: comment.journal_id,
+            author: comment.author
+        }
+    },
 
 };
+
+
 
 module.exports = JournalsService;
