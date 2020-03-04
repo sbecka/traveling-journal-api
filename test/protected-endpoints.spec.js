@@ -95,7 +95,7 @@ describe.only('Protected endpoints', function() {
 
     protectedEndpoints.forEach(endpoint => {
         describe(endpoint.name, () => {
-            it.skip(`responds with 401 'Missing bearer token' when no bearer token`, () => {
+            it(`responds with 401 'Missing bearer token' when no bearer token`, () => {
                 return endpoint.method(endpoint.path)
                     .expect(401, { error: `Missing bearer token` })
             });
@@ -108,17 +108,10 @@ describe.only('Protected endpoints', function() {
                     .expect(401, { error: `Unauthorized request` })
             });
 
-            it.skip(`responds with 401 'Unauthorized request' when invalid user`, () => {
-                const userInvalidCreds = { user_name: 'user-not', password: 'existy' };
+            it(`responds with 401 'Unauthorized request' when invalid sub in payload`, () => {
+                const invalidUser = { email: 'bad@email', id: 1 };
                 return endpoint.method(endpoint.path)
-                    .set('Authorization', fixtures.makeAuthHeader(userInvalidCreds))
-                    .expect(401, { error: `Unauthorized request` })
-            });
-
-            it.skip(`responds with 401 'Unauthorized request' when invalid password`, () => {
-                const userInvalidPass = { user_name: testUsers[0].user_name, password: 'wrong' };
-                return endpoint.method(endpoint.path)
-                    .set('Authorization', fixtures.makeAuthHeader(userInvalidPass))
+                    .set('Authorization', fixtures.makeAuthHeader(invalidUser))
                     .expect(401, { error: `Unauthorized request` })
             });
         });
