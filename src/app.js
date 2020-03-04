@@ -4,6 +4,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const { NODE_ENV, CLIENT_ORIGIN } = require('./config');
 const journalsRouter = require('./journals/journals-router');
+const commentsRouter = require('./comments/comments-router');
 
 const app = express();
 
@@ -17,6 +18,8 @@ app.use(
 );
 
 app.use('/api/journals', journalsRouter);
+
+app.use('/api/comments', commentsRouter);
 
 app.use(function errorHandler(error, req, res, next) {
     let response;

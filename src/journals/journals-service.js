@@ -91,8 +91,8 @@ const JournalsService = {
         return {
             id: comment.id,
             text: xss(comment.text),
-            date_created: new Date(comment.date_created),
             journal_id: comment.journal_id,
+            date_created: new Date(comment.date_created),
             author: comment.author
         }
     },
