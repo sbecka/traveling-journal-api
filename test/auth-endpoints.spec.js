@@ -1,4 +1,6 @@
 const knex = require('knex');
+const jwt = require('jsonwebtoken');
+
 const app = require('../src/app');
 const fixtures = require('./journals.fixtures');
 
@@ -49,25 +51,25 @@ describe.only('Auth Endpoints', function() {
         const requiredFields = ['email', 'password'];
 
         requiredFields.forEach(field => {
-            const loginTest = {
+            const loginAttempt = {
                 email: testUser.email,
                 password: testUser.password,
             };
 
             it(`responds with 400 and an error message when the '${field}' is missing`, () => {
-                delete loginTest[field];
+                delete loginAttempt[field];
 
                 return supertest(app)
                     .post('/api/auth/login')
-                    .send(loginTest)
+                    .send(loginAttempt)
                     .expect(400, {
-                        error: `Missing '${field}' in request body`,
+                        error: `Missing '${field}' in request body`
                     })
                 })
         });
 
         it(`reponds with 400 and 'invalid email or password' when bad email`, () => {
-            const invalidEmail = { email: 'not@email.com', password: 'pasS3!word' };
+            const invalidEmail = { email: 'not@email.com', password: testUser.password };
             return supertest(app)
                 .post('/api/auth/login')
                 .send(invalidEmail)
@@ -80,6 +82,30 @@ describe.only('Auth Endpoints', function() {
                 .post('/api/auth/login')
                 .send(invalidPassword)
                 .expect(400, { error: `Incorrect email or password` })
+        });
+
+        it(`responds 200 and JWT token using secret when valid login`, (done) => {
+            done(); // avoid error timeout when running test
+            const validLogin = {
+                email: testUser.email,
+                password: testUser.password
+            };
+
+            const expectedToken = jwt.sign(
+                { user_id: testUser.id },
+                process.env.JWT_SECRET,
+                {
+                    subject: testUser.email,
+                    algorithm: 'HS256'
+                }
+            );
+
+            return supertest(app)
+                .post('/api/auth/login')
+                .send(validLogin)
+                .expect(200, {
+                    authToken: expectedToken
+                })
         });
     });
 });

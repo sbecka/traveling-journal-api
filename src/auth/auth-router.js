@@ -11,11 +11,39 @@ authRouter
         for (const [key, value] of Object.entries(loginUser)) {
             if (value == null) {
                 return res.status(400).json({
-                    error: message `Missing '${key}' in request body`
+                    error: `Missing '${key}' in request body`
                 })
             }
         }
-        res.send('ok')
+
+        AuthService.getUserWithEmail(
+            req.app.get('db'),
+            loginUser.email
+        )
+            .then(dbUser => {
+                if (!dbUser) {
+                    return res.status(400).json({
+                        error: `Incorrect email or password`
+                    })
+                }
+
+                return AuthService.comparePasswords(loginUser.password, dbUser.password)
+                    .then(compareMatchingPass => {
+                        if (!compareMatchingPass) {
+                            return res.status(400).json({
+                                error: `Incorrect email or password`
+                            })
+                        }
+
+                        const sub = dbUser.email;
+                        const payload = { user_id: dbUser.id };
+                        res.send({
+                            authToken: AuthService.createJWT(sub, payload)
+                        })
+
+                    })
+            })
+            .catch(next)
     })
 
 module.exports = authRouter;
