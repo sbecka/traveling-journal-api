@@ -71,24 +71,43 @@ describe.only('Journals Endpoints', function() {
         });
     });
 
-    describe.only('POST /api/journals', () => {
-        it('responds with 201 and creates a new journal, returns new journal', () => {
-            this.retries(3);
+    describe('POST /api/journals', () => {
+
+        beforeEach('insert users', () => {
+            return db
+                .into('traveling_users')
+                .insert(testUsers)
+        });
+
+        it('responds with 201 and creates a new journal, then returns new journal', function() {
+            this.retries(5); // log will show journal with id 1 created
             const testUser = testUsers[0];
             const newJournal = {
                 title:"Lovely Lakes", 
                 location: "Canada", 
                 content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
-                start_date: "2019-05-09 20:00:00", 
-                end_date: "2019-05-15 20:00:00", 
+                start_date: new Date("2019-05-09 20:00:00").toISOString(), 
+                end_date: new Date("2019-05-15 20:00:00").toISOString(), 
                 author_id: testUser.id
             };
 
             return supertest(app)
-                .post(`/api/journals`)
+                .post('/api/journals')
                 .send(newJournal)
                 .expect(201)
                 .expect(res => {
+                    // console.log(res);
+                    //  body: {
+                    //     id: 1,
+                    //     title: 'Lovely Lakes',
+                    //     location: 'Canada',
+                    //     content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
+                    //     start_date: '2019-05-09T20:00:00.000Z',
+                    //     end_date: '2019-05-15T20:00:00.000Z',
+                    //     date_created: '2020-03-03T23:31:43.512Z',
+                    //     date_modified: null,
+                    //     number_of_comments: null
+                    //   }
                     expect(res.body).to.have.property('id')
                     expect(res.body.title).to.eql(newJournal.title)
                     expect(res.body.location).to.eql(newJournal.location)
@@ -97,8 +116,9 @@ describe.only('Journals Endpoints', function() {
                     expect(res.body.end_date).to.eql(newJournal.end_date)
                     const expectedDateCreated = new Date().toISOString()
                     const actualDate = new Date(res.body.date_created).toISOString()
-                    expect(actualDate).to.eql(expectedDateCreated);
+                    expect(actualDate).to.eql(expectedDateCreated); // only error with matching ISOString milliseconds, .sssZ part
                     expect(res.body.author_id).to.eql(testUser.id)
+                    expect(res.headers.location).to.eql(`/api/journals/${res.body.id}`)
                 })
                 .expect(res =>
                     db
@@ -118,7 +138,31 @@ describe.only('Journals Endpoints', function() {
                             expect(row.author_id).to.eql(testUser.id)
                         })
                 )
-        })
+        });
+
+        const requiredFields = ['title', 'location', 'content', 'start_date', 'end_date'];
+        // 5 tests for fields
+        requiredFields.forEach(field => {
+            const newJournal = {
+                title:"Lovely Lakes", 
+                location: "Canada", 
+                content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
+                start_date: new Date("2019-05-09 20:00:00"), 
+                end_date: new Date("2019-05-15 20:00:00"),
+            };
+
+            it(`responds with 400 and error message when the '${field}' is missing`, () => {
+                delete newJournal[field]
+
+                return supertest(app)
+                    .post('/api/journals')
+                    .send(newJournal)
+                    .expect(400, {
+                        error: { message: `Missing '${field}' in request body` }
+                    })
+            });
+        });
+
     });
 
     describe(`GET /api/journals/:journal_id`, () => {
@@ -131,7 +175,9 @@ describe.only('Journals Endpoints', function() {
                 const journalId = 321;
                 return supertest(app)
                     .get(`/api/journals/${journalId}`)
-                    .expect(404, { error: `Journal doesn't exist` })
+                    .expect(404, { 
+                        error: { message: `Journal doesn't exist` } 
+                    })
             });
         });
 
@@ -160,6 +206,169 @@ describe.only('Journals Endpoints', function() {
         });
     });
 
+    describe('DELETE /api/journals/:journal_id', () => {
+        context(`Given no journals in database`, () => {
+            it(`responds 404 when bookmark doesn't exist`, () => {
+                const bookmarkId = 123;
+                return supertest(app)
+                    .delete(`/api/journals/${bookmarkId}`)
+                    .expect(404, {
+                        error: { message: `Journal doesn't exist` }
+                    })
+            });
+        });
+
+        context(`Given journals are in database`, () => {
+
+            beforeEach('insert journals', () => {
+                return db
+                    .into('traveling_users')
+                    .insert(testUsers)
+                    .then(() => {
+                        return db
+                            .into('traveling_journals')
+                            .insert(testJournals)
+                    })
+            });
+
+            it(`responds with 204 and deletes the journal`, () => {
+                const deleteId = 1;
+                const expectedJournals = testJournals.filter(journal => journal.id !== deleteId);
+
+                return supertest(app)
+                    .delete(`/api/journals/${deleteId}`)
+                    .expect(204)
+                    .then(res => {
+                        supertest(app)
+                            .get('/api/journals')
+                            .expect(expectedJournals)
+                    })
+            });
+        });
+    });
+
+    describe.only('PATCH /api/journals/:journal_id', () => {
+        context('Given no journals in database', () => {
+            it('responds 404 if Journal does not exist', () => {
+                const journalId = 321
+                return supertest(app)
+                    .patch(`/api/journals/${journalId}`)
+                    .expect(404, {  error: { message: `Journal doesn't exist` }  })
+            });
+        });
+
+        context('Given journals in database', () => {
+    
+            beforeEach('insert journals', () => {
+                return db
+                    .into('traveling_users')
+                    .insert(testUsers)
+                    .then(() => {
+                        return db
+                            .into('traveling_journals')
+                            .insert(testJournals)
+                    })
+                    
+            });
+
+            it('responds with 204 and updates the journal', function() {
+                this.retries(3); // logger logs journal with id updated
+
+                const updateId = 1;
+                const updatedJournal = {
+                    title: "Lovely Time", 
+                    location: "Madrid, Spain", 
+                    content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
+                    start_date: new Date("2019-05-09 20:00:00").toISOString(), 
+                    end_date: new Date("2019-05-15 20:00:00").toISOString(),
+                    date_modified: new Date().toISOString() //date_modified .ISOSting() millisecond issue
+                };
+
+                const testJournal = {
+                    id: 1,
+                    title: "Spanish Delight",
+                    location: "Madrid, Spain",
+                    content: "Lorem ipsum dolor sit amet, deserunt mollit anim id est laborum.",
+                    start_date: new Date('Wed Jun 05 2019 20:00:00').toISOString(),
+                    end_date: new Date('Thu Jun 06 2019 20:00:00').toISOString(),
+                    date_created: new Date('2020-01-22T16:28:32.615Z').toISOString(),
+                    author: testUsers[0].full_name, // need to specify author and number_of_comments
+                    number_of_comments: 0,
+                    date_modified: null
+                };
+
+                const expectedJournal = {
+                    ...testJournal,
+                    ...updatedJournal
+                };
+
+                // console.log(expectedJournal);
+                return supertest(app)
+                    .patch(`/api/journals/${updateId}`)
+                    .send(updatedJournal)
+                    .expect(204)
+                    .then(res =>
+                        supertest(app)
+                            .get(`/api/journals/${updateId}`)
+                            .expect(expectedJournal)
+                    )
+            });
+
+            it('responds with 400 when no required fields are in request', () => {
+                const updateId = 2;
+                return supertest(app)
+                    .patch(`/api/journals/${updateId}`)
+                    .send({ badField: 'foobar' })
+                    .expect(400, {
+                        error: {
+                            message: `Request body must have either 'title', 'location', 'content', 'start_date', 'end_date', or 'date_modified'`
+                        }
+                    })
+            });
+
+            it.only(`responds with 204 when updating only a given field`, function() {
+                this.retries(3); // logger logs journal with id updated
+                
+                const updateId = 1;
+                const updateJournal = {
+                    title: 'Updated journal title',
+                    date_modified: new Date().toISOString() //date_modified .ISOSting() millisecond issue
+                };
+
+                const testJournal = {
+                    id: 1,
+                    title: "Spanish Delight",
+                    location: "Madrid, Spain",
+                    content: "Lorem ipsum dolor sit amet, deserunt mollit anim id est laborum.",
+                    start_date: new Date('Wed Jun 05 2019 20:00:00').toISOString(),
+                    end_date: new Date('Thu Jun 06 2019 20:00:00').toISOString(),
+                    date_created: new Date('2020-01-22T16:28:32.615Z').toISOString(),
+                    author: testUsers[0].full_name, // need to specify author and number_of_comments
+                    number_of_comments: 0,
+                    date_modified: null
+                };
+
+                const expectedJournal = {
+                    ...testJournal,
+                    ...updateJournal
+                };
+
+                return supertest(app)
+                    .patch(`/api/journals/${updateId}`)
+                    .send({
+                        ...updateJournal,
+                        fieldToIgnore : 'should not be in the GET response below'
+                    })
+                    .expect(204)
+                    .then(res => 
+                        supertest(app)
+                            .get(`/api/journals/${updateId}`)
+                            .expect(expectedJournal)    
+                    )
+            });
+        });
+    });
+
     describe(`Get /api/journal/:journal_id/comments`, () => {
         context(`Given no journals in database`, () => {
             beforeEach(() => 
@@ -170,8 +379,11 @@ describe.only('Journals Endpoints', function() {
                 const journalId = 321;
                 return supertest(app)
                     .get(`/api/journals/${journalId}/comments`)
-                    .expect(404, { error: `Journal doesn't exist` })
+                    .expect(404, { 
+                        error: { message: `Journal doesn't exist` } 
+                    })
             });
+
         });
 
         context(`Given journal with comments are in database`, () => {

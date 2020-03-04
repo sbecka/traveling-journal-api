@@ -4,6 +4,7 @@ const JournalsService = require('./journals-service');
 
 const journalsRouter = express.Router();
 const jsonParser = express.json();
+const logger = require('../logger');
 
 journalsRouter
     .route('/')
@@ -21,7 +22,7 @@ journalsRouter
         for (const [key, value] of Object.entries(newJournal)) {
             if (value == null) {
                 return res.status(400).json({
-                    error: `Missing '${key}' in request body`
+                    error: { message: `Missing '${key}' in request body`}
                 })
             }
         }
@@ -34,7 +35,7 @@ journalsRouter
             newJournal
         )
             .then(journal => {
-                //console.log(journal);
+                logger.info(`Journal with id ${journal.id} created`);
                 res
                     .status(201)
                     .location(path.posix.join(req.originalUrl, `/${journal.id}`))
@@ -62,9 +63,9 @@ journalsRouter
     })
     .patch(jsonParser, (req, res, next) => {
         const { title, location, content, start_date, end_date, date_modified } = req.body;
-        const updatedJournal = { title, location, content, start_date, end_date, date_modified };
+        const updateJournal = { title, location, content, start_date, end_date, date_modified };
 
-        const numberofFieldValues = Object.values(updatedJournal);
+        const numberofFieldValues = Object.values(updateJournal).filter(Boolean).length;
         if (numberofFieldValues === 0) {
             return res.status(400).json({
                 error: {
@@ -73,14 +74,15 @@ journalsRouter
             })
         }
 
-        updatedJournal.date_modified = new Date();
+        updateJournal.date_modified = new Date();
 
         JournalsService.updateJournal(
             req.app.get('db'),
             req.params.journal_id,
-            updatedJournal
+            updateJournal
         )
             .then(numberOfRowsAffected => {
+                logger.info(`Journal with id ${req.params.journal_id} updated`);
                 res.status(204).end()
             })
             .catch(next)
@@ -109,7 +111,7 @@ async function checkJournalExists(req, res, next) {
 
         if (!journal)
             return res.status(404).json({
-                error: `Journal doesn't exist`
+                error: { message: `Journal doesn't exist` }
             });
 
             res.journal = journal;
