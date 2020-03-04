@@ -8,10 +8,10 @@ TRUNCATE
 
 INSERT INTO traveling_users (full_name, email, password)
 VALUES
-    ('John Doe', 'example@mail.com','pasS3!word'),
-    ('Jane Lane', 'jl3le@mail.com','pass^9woRd1'),
-    ('Bob Roe', 'bos9i8e@mail.com','pass)4wOrd2'),
-    ('Luke Sky', 'skywalker2@mail.com','pa9!ssWord4orce');
+    ('John Doe', 'example@mail.com', '$2a$12$e0Lcac9QzwplVNPcXa2//OeFxliKWNWf..SbjxW0HfTNprO9dqeqm'),
+    ('Jane Lane', 'jl3le@mail.com', '$2a$12$4SnTmEpJhQGwAF7WTBEJ5e1mUsOcb6gweytkQPC/un/r5IVjq.9ii'),
+    ('Bob Roe', 'bos9i8e@mail.com', '$2a$12$Vc5zhiSrp5RhhP06lTIvoOAFStyugqalOjuPmz/yzUZ.ts7aLh0R6'),
+    ('Luke Sky', 'skywalker2@mail.com', '$2a$12$d9TBVPKRDBNz80PM5q8/r.K2GZsfqmNf9zEEK9EzXShucGqn3Q.dW');
 
 INSERT INTO traveling_journals (title, location, content, start_date, end_date, author_id)
 VALUES

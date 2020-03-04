@@ -1,3 +1,5 @@
+const bcrypt = require('bcryptjs');
+
 function makeTestUsers() {
     return [
         {   
@@ -134,17 +136,22 @@ function makeJournalsFixtures() {
 };
 
 function seedTravelingJournalsTables(db, users, journals, comments=[]) {
-    return db
-        .into('traveling_users')
-        .insert(users)
-        .then(() =>
-            db
-                .into('traveling_journals')
-                .insert(journals)
+    return db.transaction(async trx => {
+        await seedUsers(trx, users)
+        await trx.into('traveling_journals').insert(journals)
+        await trx.raw(
+            `SELECT setval('traveling_journals_id_seq', ?)`,
+            [journals[journals.length - 1].id]
         )
-        .then(() => 
-            comments.length && db.into('traveling_comments').insert(comments)
-        )
+
+        if (comments.length) {
+            await trx.into('traveling_comments').insert(comments)
+            await trx.raw(
+                `SELECT setval('traveling_comments_id_seq', ?)`,
+                [comments[comments.length - 1].id]
+            )
+        }
+    });
 };
 
 function makeExpectedJournal(users, journal, comments=[]) {
@@ -181,7 +188,11 @@ function makeExpectedJournalComments(users, journalId, comments) {
 };
 
 function seedUsers(db, users) {
-    return db.into('traveling_users').insert(users)
+    const preppedUsers = users.map(user => ({
+        ...user,
+        password: bcrypt.hashSync(user.password, 1)
+    }))
+    return db.into('traveling_users').insert(preppedUsers)
         .then(() => 
             db.raw(
                 `SELECT setval('traveling_users_id_seq', ?)`,

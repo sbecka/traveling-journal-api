@@ -2,7 +2,7 @@ const knex = require('knex');
 const app = require('../src/app');
 const fixtures = require('./journals.fixtures');
 
-describe.only('Journals Endpoints', function() {
+describe('Journals Endpoints', function() {
     let db;
 
     const { testUsers, testJournals, testComments } = fixtures.makeJournalsFixtures();
@@ -70,7 +70,7 @@ describe.only('Journals Endpoints', function() {
             });
         });
 
-        context.only(`Given an XSS attack on journal`, () => {
+        context(`Given an XSS attack on journal`, () => {
             const testUser = testUsers[1];
             const {
                 maliciousJournal,
@@ -190,7 +190,7 @@ describe.only('Journals Endpoints', function() {
             });
         });
 
-        context.only(`Given an XSS attack on posting journal`, () => {
+        context(`Given an XSS attack on posting journal`, () => {
             
             it('removes XSS attack content', () => {
                 const testUser = testUsers[0];
@@ -216,7 +216,7 @@ describe.only('Journals Endpoints', function() {
     describe(`GET /api/journals/:journal_id`, () => {
         context(`Given no journals in database`, () => {
             beforeEach(() => 
-                db.into('traveling_users').insert(testUsers)
+                fixtures.seedUsers(db, testUsers)
             );
 
             it(`responds with 404 for journal that doesn't exist`, () => {
@@ -253,7 +253,7 @@ describe.only('Journals Endpoints', function() {
             });
         });
 
-        context.only(`Given an XSS attack on journal`, () => {
+        context(`Given an XSS attack on journal`, () => {
             const testUser = testUsers[1];
             const {
                 maliciousJournal,
@@ -321,7 +321,7 @@ describe.only('Journals Endpoints', function() {
 
     describe('PATCH /api/journals/:journal_id', () => {
         context('Given no journals in database', () => {
-            it('responds 404 if Journal does not exist', () => {
+            it('responds 404 if journal does not exist', () => {
                 const journalId = 321
                 return supertest(app)
                     .patch(`/api/journals/${journalId}`)
@@ -441,7 +441,7 @@ describe.only('Journals Endpoints', function() {
     describe(`GET /api/journal/:journal_id/comments`, () => {
         context(`Given no journals in database`, () => {
             beforeEach(() => 
-                db.into('traveling_users').insert(testUsers)
+                fixtures.seedUsers(db, testUsers)
             );
 
             it(`responds with 404 for journal that doesn't exist`, () => {
