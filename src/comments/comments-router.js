@@ -6,6 +6,8 @@ const commentsRouter = express.Router();
 const jsonParser = express.json();
 const logger = require('../logger');
 
+// app only post comments, but I would like to add delete a comment too
+
 commentsRouter
     .route('/')
     .get((req, res, next) => {
@@ -61,9 +63,6 @@ commentsRouter
                 next();
             })
             .catch(next)
-    })
-    .get((req, res, next) => {
-        res.json(CommentsService.serializeComment(res.comment))
     })
     .delete((req, res, next) => {
         CommentsService.deleteComment(

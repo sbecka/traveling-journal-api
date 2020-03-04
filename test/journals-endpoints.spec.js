@@ -2,7 +2,7 @@ const knex = require('knex');
 const app = require('../src/app');
 const fixtures = require('./journals.fixtures');
 
-describe.only('Journals Endpoints', function() {
+describe('Journals Endpoints', function() {
     let db;
 
     const { testUsers, testJournals, testComments } = fixtures.makeJournalsFixtures();
@@ -208,10 +208,10 @@ describe.only('Journals Endpoints', function() {
 
     describe('DELETE /api/journals/:journal_id', () => {
         context(`Given no journals in database`, () => {
-            it(`responds 404 when bookmark doesn't exist`, () => {
-                const bookmarkId = 123;
+            it(`responds 404 when journal doesn't exist`, () => {
+                const journalId = 123;
                 return supertest(app)
-                    .delete(`/api/journals/${bookmarkId}`)
+                    .delete(`/api/journals/${journalId}`)
                     .expect(404, {
                         error: { message: `Journal doesn't exist` }
                     })
@@ -220,16 +220,13 @@ describe.only('Journals Endpoints', function() {
 
         context(`Given journals are in database`, () => {
 
-            beforeEach('insert journals', () => {
-                return db
-                    .into('traveling_users')
-                    .insert(testUsers)
-                    .then(() => {
-                        return db
-                            .into('traveling_journals')
-                            .insert(testJournals)
-                    })
-            });
+            beforeEach('insert journals', () => 
+                fixtures.seedTravelingJournalsTables(
+                    db,
+                    testUsers,
+                    testJournals
+                )
+            );
 
             it(`responds with 204 and deletes the journal`, () => {
                 const deleteId = 1;
@@ -247,7 +244,7 @@ describe.only('Journals Endpoints', function() {
         });
     });
 
-    describe.only('PATCH /api/journals/:journal_id', () => {
+    describe('PATCH /api/journals/:journal_id', () => {
         context('Given no journals in database', () => {
             it('responds 404 if Journal does not exist', () => {
                 const journalId = 321
@@ -258,18 +255,14 @@ describe.only('Journals Endpoints', function() {
         });
 
         context('Given journals in database', () => {
-    
-            beforeEach('insert journals', () => {
-                return db
-                    .into('traveling_users')
-                    .insert(testUsers)
-                    .then(() => {
-                        return db
-                            .into('traveling_journals')
-                            .insert(testJournals)
-                    })
-                    
-            });
+            
+            beforeEach('insert journals', () => 
+                fixtures.seedTravelingJournalsTables(
+                    db,
+                    testUsers,
+                    testJournals
+                )
+            );
 
             it('responds with 204 and updates the journal', function() {
                 this.retries(3); // logger logs journal with id updated
@@ -326,7 +319,7 @@ describe.only('Journals Endpoints', function() {
                     })
             });
 
-            it.only(`responds with 204 when updating only a given field`, function() {
+            it(`responds with 204 when updating only a given field`, function() {
                 this.retries(3); // logger logs journal with id updated
                 
                 const updateId = 1;

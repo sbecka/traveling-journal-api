@@ -27,6 +27,9 @@ const CommentsService = {
             .then(rows => {
                 return rows[0]
             })
+            .then(comment => 
+                CommentsService.getById(db, comment.id)
+            )
     },
     getById(db, id) {
         return CommentsService.getAllComments(db)
