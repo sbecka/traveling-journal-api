@@ -3,8 +3,8 @@ const app = require('../src/app');
 const fixtures = require('./journals.fixtures');
 
 describe('Comments Endpoints', function() {
-    let db;
 
+    let db;
     const { testUsers, testJournals, testComments } = fixtures.makeJournalsFixtures();
 
     before('make knex instance', () => {
@@ -38,6 +38,7 @@ describe('Comments Endpoints', function() {
     });
 
     describe(`POST /api/comments`, () => {
+
         beforeEach('insert journals', () => 
             fixtures.seedTravelingJournalsTables(
                 db,
@@ -58,6 +59,7 @@ describe('Comments Endpoints', function() {
             // console.log(newComment);
             return supertest(app)
                 .post('/api/comments')
+                .set(`Authorization`, fixtures.makeAuthHeader(testUsers[0]))
                 .send(newComment)
                 .expect(201)
                 .expect(res => {
@@ -102,6 +104,7 @@ describe('Comments Endpoints', function() {
 
                 return supertest(app)
                     .post('/api/comments')
+                    .set(`Authorization`, fixtures.makeAuthHeader(testUsers[0]))
                     .send(newComment)
                     .expect(400, {
                         error: `Missing '${field}' in request body`,
@@ -112,15 +115,23 @@ describe('Comments Endpoints', function() {
     });
 
     describe('DELETE /api/comments/:comment_id', () => {
+
         context(`Given no comments in database`, () => {
+
+            beforeEach(() => 
+                fixtures.seedUsers(db, testUsers)
+            );
+
             it(`responds 404 when comment doesn't exist`, () => {
                 const commentId = 123;
                 return supertest(app)
                     .delete(`/api/comments/${commentId}`)
+                    .set(`Authorization`, fixtures.makeAuthHeader(testUsers[0]))
                     .expect(404, {
                         error: { message: `Comment doesn't exist` }
                     })
             });
+
         });
 
         context(`Given comments are in database`, () => {
@@ -140,6 +151,7 @@ describe('Comments Endpoints', function() {
 
                 return supertest(app)
                     .delete(`/api/comments/${deleteId}`)
+                    .set(`Authorization`, fixtures.makeAuthHeader(testUsers[0]))
                     .expect(204)
                     .then(res => {
                         supertest(app)
@@ -147,6 +159,7 @@ describe('Comments Endpoints', function() {
                             .expect(expectedComments)
                     })
             });
+
         });
     });
 });

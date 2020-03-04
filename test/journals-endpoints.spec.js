@@ -110,13 +110,11 @@ describe.only('Journals Endpoints', function() {
         });
     });
 
-    describe('POST /api/journals', () => {
+    describe.only('POST /api/journals', () => {
 
-        beforeEach('insert users', () => {
-            return db
-                .into('traveling_users')
-                .insert(testUsers)
-        });
+        beforeEach(() => 
+            fixtures.seedUsers(db, testUsers)
+        );
 
         it('responds with 201 and creates a new journal, then returns new journal', function() {
             this.retries(5); // log will show journal with id 1 created
