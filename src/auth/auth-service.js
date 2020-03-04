@@ -11,13 +11,18 @@ const AuthService = {
     comparePasswords(password, hash) {
         return bcrypt.compare(password, hash)
     },
-    createJWT(subject, payload) {
+    createJwt(subject, payload) {
         return jwt.sign(payload, config.JWT_SECRET, {
             subject,
             algorithm: 'HS256'
         })
+    },
+    verifyJwt(token) {
+        return jwt.verify(token, config.JWT_SECRET, {
+            algorithms: ['HS256']
+        })
     }
 
-}
+};
 
 module.exports = AuthService;

@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const app = require('../src/app');
 const fixtures = require('./journals.fixtures');
 
-describe.only('Auth Endpoints', function() {
+describe('Auth Endpoints', function() {
     let db;
 
     const { testUsers } = fixtures.makeJournalsFixtures();

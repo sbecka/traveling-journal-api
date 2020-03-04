@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const JournalsService = require('./journals-service');
+const { requireAuth } = require('../middleware/jwt-auth');
 
 const journalsRouter = express.Router();
 const jsonParser = express.json();
@@ -8,6 +9,7 @@ const logger = require('../logger');
 
 journalsRouter
     .route('/')
+    .all(requireAuth)
     .get((req, res, next) => {
         JournalsService.getAllJournals(req.app.get('db'))
             .then(journals => {
@@ -47,6 +49,7 @@ journalsRouter
 
 journalsRouter
     .route('/:journal_id')
+    .all(requireAuth)
     .all(checkJournalExists)
     .get((req, res) => {
         res.json(JournalsService.serializeJournal(res.journal))
@@ -90,6 +93,7 @@ journalsRouter
 
 journalsRouter
     .route('/:journal_id/comments')
+    .all(requireAuth)
     .all(checkJournalExists)
     .get((req, res, next) => {
         JournalsService.getCommentsForJournal(
