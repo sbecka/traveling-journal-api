@@ -2,9 +2,9 @@ const knex = require('knex');
 const app = require('../src/app');
 const fixtures = require('./journals.fixtures');
 
-describe('Journals Endpoints', function() {
-    let db;
+describe.only('Journals Endpoints', function() {
 
+    let db;
     const { testUsers, testJournals, testComments } = fixtures.makeJournalsFixtures();
 
     before('make knex instance', () => {
@@ -38,15 +38,23 @@ describe('Journals Endpoints', function() {
     });
     
     describe(`GET /api/journals`, () => {
+
         context(`Given no journals in database`, () => {
+
+            beforeEach(() => 
+                fixtures.seedUsers(db, testUsers)
+            );
+
             it(`responds with 200 and an empty array`, () => {
                 return supertest(app)
                     .get('/api/journals')
+                    .set(`Authorization`, fixtures.makeAuthHeader(testUsers[0]))
                     .expect(200, [])
             });
         });
 
         context(`Given journals are in database`, () => {
+
             beforeEach('insert journals', () =>
                 fixtures.seedTravelingJournalsTables(
                     db,
@@ -64,13 +72,16 @@ describe('Journals Endpoints', function() {
                         testComments
                     )
                 );
+
                 return supertest(app)
                     .get('/api/journals')
+                    .set(`Authorization`, fixtures.makeAuthHeader(testUsers[0]))
                     .expect(200, expectedJournals)
             });
         });
 
         context(`Given an XSS attack on journal`, () => {
+
             const testUser = testUsers[1];
             const {
                 maliciousJournal,
@@ -88,6 +99,7 @@ describe('Journals Endpoints', function() {
             it('removes XSS attack content', () => {
                 return supertest(app)
                 .get(`/api/journals`)
+                .set(`Authorization`, fixtures.makeAuthHeader(testUser))
                 .expect(200)
                 .expect(res => {
                     expect(res.body[0].title).to.eql(expectedJournal.title)
@@ -120,6 +132,7 @@ describe('Journals Endpoints', function() {
 
             return supertest(app)
                 .post('/api/journals')
+                .set(`Authorization`, fixtures.makeAuthHeader(testUsers[0]))
                 .send(newJournal)
                 .expect(201)
                 .expect(res => {
@@ -183,6 +196,7 @@ describe('Journals Endpoints', function() {
 
                 return supertest(app)
                     .post('/api/journals')
+                    .set(`Authorization`, fixtures.makeAuthHeader(testUsers[0]))
                     .send(newJournal)
                     .expect(400, {
                         error: { message: `Missing '${field}' in request body` }
@@ -201,6 +215,7 @@ describe('Journals Endpoints', function() {
 
                 return supertest(app)
                     .post(`/api/journals`)
+                    .set(`Authorization`, fixtures.makeAuthHeader(testUsers[0]))
                     .send(maliciousJournal)
                     .expect(201)
                     .expect(res => {
@@ -214,7 +229,9 @@ describe('Journals Endpoints', function() {
     });
 
     describe(`GET /api/journals/:journal_id`, () => {
+
         context(`Given no journals in database`, () => {
+
             beforeEach(() => 
                 fixtures.seedUsers(db, testUsers)
             );
@@ -223,6 +240,7 @@ describe('Journals Endpoints', function() {
                 const journalId = 321;
                 return supertest(app)
                     .get(`/api/journals/${journalId}`)
+                    .set(`Authorization`, fixtures.makeAuthHeader(testUsers[0]))
                     .expect(404, { 
                         error: { message: `Journal doesn't exist` } 
                     })
@@ -230,6 +248,7 @@ describe('Journals Endpoints', function() {
         });
 
         context(`Given journals are in database`, () => {
+
             beforeEach('insert journals', () => 
                 fixtures.seedTravelingJournalsTables(
                     db,
@@ -249,6 +268,7 @@ describe('Journals Endpoints', function() {
 
                 return supertest(app)
                     .get(`/api/journals/${journalId}`)
+                    .set(`Authorization`, fixtures.makeAuthHeader(testUsers[0]))
                     .expect(200, expectedJournal)
             });
         });
@@ -271,6 +291,7 @@ describe('Journals Endpoints', function() {
             it('removes XSS attack content', () => {
                 return supertest(app)
                     .get(`/api/journals/${maliciousJournal.id}`)
+                    .set(`Authorization`, fixtures.makeAuthHeader(testUser))
                     .expect(200)
                     .expect(res => {
                         expect(res.body.title).to.eql(expectedJournal.title)
@@ -282,11 +303,18 @@ describe('Journals Endpoints', function() {
     });
 
     describe('DELETE /api/journals/:journal_id', () => {
+
         context(`Given no journals in database`, () => {
+
+            beforeEach(() => 
+                fixtures.seedUsers(db, testUsers)
+            );
+
             it(`responds 404 when journal doesn't exist`, () => {
                 const journalId = 123;
                 return supertest(app)
                     .delete(`/api/journals/${journalId}`)
+                    .set(`Authorization`, fixtures.makeAuthHeader(testUsers[0]))
                     .expect(404, {
                         error: { message: `Journal doesn't exist` }
                     })
@@ -309,6 +337,7 @@ describe('Journals Endpoints', function() {
 
                 return supertest(app)
                     .delete(`/api/journals/${deleteId}`)
+                    .set(`Authorization`, fixtures.makeAuthHeader(testUsers[0]))
                     .expect(204)
                     .then(res => {
                         supertest(app)
@@ -320,11 +349,18 @@ describe('Journals Endpoints', function() {
     });
 
     describe('PATCH /api/journals/:journal_id', () => {
+
         context('Given no journals in database', () => {
+
+            beforeEach(() => 
+                fixtures.seedUsers(db, testUsers)
+            );
+
             it('responds 404 if journal does not exist', () => {
                 const journalId = 321
                 return supertest(app)
                     .patch(`/api/journals/${journalId}`)
+                    .set(`Authorization`, fixtures.makeAuthHeader(testUsers[0]))
                     .expect(404, {  error: { message: `Journal doesn't exist` }  })
             });
         });
@@ -349,7 +385,7 @@ describe('Journals Endpoints', function() {
                     content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
                     start_date: new Date("2019-05-09 20:00:00").toISOString(), 
                     end_date: new Date("2019-05-15 20:00:00").toISOString(),
-                    date_modified: new Date().toISOString() //date_modified .ISOSting() millisecond issue
+                    date_modified: new Date().toISOString() //date_modified .ISOSting() millisecond issue causes error
                 };
 
                 const testJournal = {
@@ -373,11 +409,13 @@ describe('Journals Endpoints', function() {
                 // console.log(expectedJournal);
                 return supertest(app)
                     .patch(`/api/journals/${updateId}`)
+                    .set(`Authorization`, fixtures.makeAuthHeader(testUsers[0]))
                     .send(updatedJournal)
                     .expect(204)
                     .then(res =>
                         supertest(app)
                             .get(`/api/journals/${updateId}`)
+                            .set(`Authorization`, fixtures.makeAuthHeader(testUsers[0]))
                             .expect(expectedJournal)
                     )
             });
@@ -386,6 +424,7 @@ describe('Journals Endpoints', function() {
                 const updateId = 2;
                 return supertest(app)
                     .patch(`/api/journals/${updateId}`)
+                    .set(`Authorization`, fixtures.makeAuthHeader(testUsers[0]))
                     .send({ badField: 'foobar' })
                     .expect(400, {
                         error: {
@@ -400,7 +439,7 @@ describe('Journals Endpoints', function() {
                 const updateId = 1;
                 const updateJournal = {
                     title: 'Updated journal title',
-                    date_modified: new Date().toISOString() //date_modified .ISOSting() millisecond issue
+                    date_modified: new Date().toISOString() //date_modified .ISOSting() millisecond issue causes error
                 };
 
                 const testJournal = {
@@ -423,6 +462,7 @@ describe('Journals Endpoints', function() {
 
                 return supertest(app)
                     .patch(`/api/journals/${updateId}`)
+                    .set(`Authorization`, fixtures.makeAuthHeader(testUsers[0]))
                     .send({
                         ...updateJournal,
                         fieldToIgnore : 'should not be in the GET response below'
@@ -431,6 +471,7 @@ describe('Journals Endpoints', function() {
                     .then(res => 
                         supertest(app)
                             .get(`/api/journals/${updateId}`)
+                            .set(`Authorization`, fixtures.makeAuthHeader(testUsers[0]))
                             .expect(expectedJournal)    
                     )
             });
@@ -439,7 +480,9 @@ describe('Journals Endpoints', function() {
     });
 
     describe(`GET /api/journal/:journal_id/comments`, () => {
+
         context(`Given no journals in database`, () => {
+
             beforeEach(() => 
                 fixtures.seedUsers(db, testUsers)
             );
@@ -448,6 +491,7 @@ describe('Journals Endpoints', function() {
                 const journalId = 321;
                 return supertest(app)
                     .get(`/api/journals/${journalId}/comments`)
+                    .set(`Authorization`, fixtures.makeAuthHeader(testUsers[0]))
                     .expect(404, { 
                         error: { message: `Journal doesn't exist` } 
                     })
@@ -456,6 +500,7 @@ describe('Journals Endpoints', function() {
         });
 
         context(`Given journal with comments are in database`, () => {
+            
             beforeEach('insert journals', () => 
                 fixtures.seedTravelingJournalsTables(
                     db,
@@ -475,6 +520,7 @@ describe('Journals Endpoints', function() {
 
                 return supertest(app)
                     .get(`/api/journals/${journalId}/comments`)
+                    .set(`Authorization`, fixtures.makeAuthHeader(testUsers[0]))
                     .expect(200, expectedComments)
             });
         });

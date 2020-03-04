@@ -2,7 +2,7 @@ const knex = require('knex');
 const app = require('../src/app');
 const fixtures = require('./journals.fixtures');
 
-describe.only('Protected endpoints', function() {
+describe('Protected endpoints', function() {
     let db;
 
     const {
