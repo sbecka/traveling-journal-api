@@ -2,7 +2,7 @@ const knex = require('knex');
 const app = require('../src/app');
 const fixtures = require('./journals.fixtures');
 
-describe('Journals Endpoints', function() {
+describe.only('Journals Endpoints', function() {
     let db;
 
     const { testUsers, testJournals, testComments } = fixtures.makeJournalsFixtures();
@@ -69,6 +69,33 @@ describe('Journals Endpoints', function() {
                     .expect(200, expectedJournals)
             });
         });
+
+        context.only(`Given an XSS attack on journal`, () => {
+            const testUser = testUsers[1]
+            const {
+                maliciousJournal,
+                expectedJournal,
+            } = fixtures.makeMaliciousJournal(testUser)
+
+            beforeEach('insert malicious journal', () => {
+                return fixtures.seedMaliciousJournal(
+                db,
+                testUser,
+                maliciousJournal,
+                )
+            })
+
+            it('removes XSS attack content', () => {
+                return supertest(app)
+                .get(`/api/journals`)
+                .expect(200)
+                .expect(res => {
+                    expect(res.body[0].title).to.eql(expectedJournal.title)
+                    expect(res.body[0].location).to.eql(expectedJournal.location)
+                    expect(res.body[0].content).to.eql(expectedJournal.content)
+                })
+            })
+        })
     });
 
     describe('POST /api/journals', () => {
@@ -204,6 +231,33 @@ describe('Journals Endpoints', function() {
                     .expect(200, expectedJournal)
             });
         });
+
+        context.only(`Given an XSS attack on journal`, () => {
+            const testUser = testUsers[1]
+            const {
+                maliciousJournal,
+                expectedJournal,
+            } = fixtures.makeMaliciousJournal(testUser)
+
+            beforeEach('insert malicious journal', () => {
+                return fixtures.seedMaliciousJournal(
+                db,
+                testUser,
+                maliciousJournal,
+                )
+            })
+
+            it('removes XSS attack content', () => {
+                return supertest(app)
+                .get(`/api/journals`)
+                .expect(200)
+                .expect(res => {
+                    expect(res.body[0].title).to.eql(expectedJournal.title)
+                    expect(res.body[0].location).to.eql(expectedJournal.location)
+                    expect(res.body[0].content).to.eql(expectedJournal.content)
+                })
+            })
+        })
     });
 
     describe('DELETE /api/journals/:journal_id', () => {
@@ -362,7 +416,7 @@ describe('Journals Endpoints', function() {
         });
     });
 
-    describe(`Get /api/journal/:journal_id/comments`, () => {
+    describe(`GET /api/journal/:journal_id/comments`, () => {
         context(`Given no journals in database`, () => {
             beforeEach(() => 
                 db.into('traveling_users').insert(testUsers)

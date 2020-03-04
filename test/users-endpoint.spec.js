@@ -2,7 +2,7 @@ const knex = require('knex');
 const app = require('../src/app');
 const fixtures = require('./journals.fixtures');
 
-describe.only('Comments Endpoints', function() {
+describe('Comments Endpoints', function() {
     let db;
 
     const { testUsers } = fixtures.makeJournalsFixtures();

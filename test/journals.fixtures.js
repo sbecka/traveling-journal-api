@@ -190,6 +190,38 @@ function seedUsers(db, users) {
         )
 };
 
+function makeMaliciousJournal(user) {
+    const maliciousJournal = {
+        id: 911,
+        title: 'Naughty naughty very naughty <script>alert("xss");</script>',
+        location: `Bad image <img src="https://url.to.file.which/does-not.exist" onerror="alert(document.cookie);">. But not <strong>all</strong> bad.`,
+        content: `Bad image <img src="https://url.to.file.which/does-not.exist" onerror="alert(document.cookie);">. But not <strong>all</strong> bad.`,
+        start_date: new Date().toISOString(),
+        end_date: new Date().toISOString(),
+        date_created: new Date().toISOString(),
+        author_id: user.id
+    };
+    const expectedJournal = {
+        ...maliciousJournal,
+        title: 'Naughty naughty very naughty &lt;script&gt;alert(\"xss\");&lt;/script&gt;',
+        location: `Bad image <img src="https://url.to.file.which/does-not.exist">. But not <strong>all</strong> bad.`,
+        content: `Bad image <img src="https://url.to.file.which/does-not.exist">. But not <strong>all</strong> bad.`
+    };
+    return {
+        maliciousJournal,
+        expectedJournal,
+    };
+};
+
+function seedMaliciousJournal(db, user, journal) {
+    return seedUsers(db, [user])
+        .then(() => 
+            db
+                .into('traveling_journals')
+                .insert([journal])
+        )
+};
+
 module.exports = {
     makeTestUsers,
     makeTestJournals,
@@ -198,5 +230,7 @@ module.exports = {
     seedTravelingJournalsTables,
     makeExpectedJournal,
     makeExpectedJournalComments,
-    seedUsers
+    seedUsers,
+    makeMaliciousJournal,
+    seedMaliciousJournal
 };
