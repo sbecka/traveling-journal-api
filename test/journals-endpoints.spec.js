@@ -71,19 +71,19 @@ describe.only('Journals Endpoints', function() {
         });
 
         context.only(`Given an XSS attack on journal`, () => {
-            const testUser = testUsers[1]
+            const testUser = testUsers[1];
             const {
                 maliciousJournal,
                 expectedJournal,
-            } = fixtures.makeMaliciousJournal(testUser)
+            } = fixtures.makeMaliciousJournal(testUser);
 
             beforeEach('insert malicious journal', () => {
                 return fixtures.seedMaliciousJournal(
-                db,
-                testUser,
-                maliciousJournal,
+                    db,
+                    testUser,
+                    maliciousJournal,
                 )
-            })
+            });
 
             it('removes XSS attack content', () => {
                 return supertest(app)
@@ -94,8 +94,8 @@ describe.only('Journals Endpoints', function() {
                     expect(res.body[0].location).to.eql(expectedJournal.location)
                     expect(res.body[0].content).to.eql(expectedJournal.content)
                 })
-            })
-        })
+            });
+        });
     });
 
     describe('POST /api/journals', () => {
@@ -190,6 +190,27 @@ describe.only('Journals Endpoints', function() {
             });
         });
 
+        context.only(`Given an XSS attack on posting journal`, () => {
+            
+            it('removes XSS attack content', () => {
+                const testUser = testUsers[0];
+                const {
+                    maliciousJournal,
+                    expectedJournal,
+                } = fixtures.makeMaliciousJournal(testUser);
+
+                return supertest(app)
+                    .post(`/api/journals`)
+                    .send(maliciousJournal)
+                    .expect(201)
+                    .expect(res => {
+                        expect(res.body.title).to.eql(expectedJournal.title)
+                        expect(res.body.location).to.eql(expectedJournal.location)
+                        expect(res.body.content).to.eql(expectedJournal.content)
+                    })
+            });
+        });
+
     });
 
     describe(`GET /api/journals/:journal_id`, () => {
@@ -233,31 +254,31 @@ describe.only('Journals Endpoints', function() {
         });
 
         context.only(`Given an XSS attack on journal`, () => {
-            const testUser = testUsers[1]
+            const testUser = testUsers[1];
             const {
                 maliciousJournal,
                 expectedJournal,
-            } = fixtures.makeMaliciousJournal(testUser)
+            } = fixtures.makeMaliciousJournal(testUser);
 
             beforeEach('insert malicious journal', () => {
                 return fixtures.seedMaliciousJournal(
-                db,
-                testUser,
-                maliciousJournal,
+                    db,
+                    testUser,
+                    maliciousJournal,
                 )
-            })
+            });
 
             it('removes XSS attack content', () => {
                 return supertest(app)
-                .get(`/api/journals`)
-                .expect(200)
-                .expect(res => {
-                    expect(res.body[0].title).to.eql(expectedJournal.title)
-                    expect(res.body[0].location).to.eql(expectedJournal.location)
-                    expect(res.body[0].content).to.eql(expectedJournal.content)
-                })
-            })
-        })
+                    .get(`/api/journals/${maliciousJournal.id}`)
+                    .expect(200)
+                    .expect(res => {
+                        expect(res.body.title).to.eql(expectedJournal.title)
+                        expect(res.body.location).to.eql(expectedJournal.location)
+                        expect(res.body.content).to.eql(expectedJournal.content)
+                    })
+            });
+        });
     });
 
     describe('DELETE /api/journals/:journal_id', () => {
@@ -414,6 +435,7 @@ describe.only('Journals Endpoints', function() {
                     )
             });
         });
+
     });
 
     describe(`GET /api/journal/:journal_id/comments`, () => {
