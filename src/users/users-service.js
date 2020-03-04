@@ -1,11 +1,6 @@
 const xss = require('xss');
 
 const UsersService = {
-    getAllUsers(db) {
-        return db
-            .select('*')
-            .from('traveling_users')
-    },
     createUser(db, newUser) {
         return db
             .insert(newUser)

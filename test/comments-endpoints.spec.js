@@ -2,7 +2,7 @@ const knex = require('knex');
 const app = require('../src/app');
 const fixtures = require('./journals.fixtures');
 
-describe.only('Comments Endpoints', function() {
+describe('Comments Endpoints', function() {
     let db;
 
     const { testUsers, testJournals, testComments } = fixtures.makeJournalsFixtures();
@@ -73,18 +73,18 @@ describe.only('Comments Endpoints', function() {
                 })
                 .expect(res =>
                     db
-                    .from('traveling_comments')
-                    .select('*')
-                    .where({ id: res.body.id })
-                    .first()
-                    .then(row => {
-                        expect(row.text).to.eql(newComment.text)
-                        expect(row.journal_id).to.eql(newComment.journal_id)
-                        expect(row.author).to.eql(testUser.full_name)
-                        const expectedDateCreated = new Date().toISOString()
-                        const actualDate = new Date(res.body.date_created).toISOString()
-                        expect(actualDate).to.eql(expectedDateCreated); // only error with matching ISOString milliseconds
-                    })
+                        .from('traveling_comments')
+                        .select('*')
+                        .where({ id: res.body.id })
+                        .first()
+                        .then(row => {
+                            expect(row.text).to.eql(newComment.text)
+                            expect(row.journal_id).to.eql(newComment.journal_id)
+                            expect(row.author).to.eql(testUser.full_name)
+                            const expectedDateCreated = new Date().toISOString()
+                            const actualDate = new Date(res.body.date_created).toISOString()
+                            expect(actualDate).to.eql(expectedDateCreated); // only error with matching ISOString milliseconds
+                        })
                 )
         });
 
