@@ -19,6 +19,12 @@ usersRouter
             }
         }
 
+        const emailError = UsersService.validateEmail(email);
+
+        if (emailError) {
+            return res.status(400).json({ error: emailError })
+        }
+
         const passwordError = UsersService.validatePassword(password);
 
         if (passwordError) {

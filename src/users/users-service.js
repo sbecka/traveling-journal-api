@@ -1,5 +1,6 @@
 const xss = require('xss');
 const REGEX_UPPER_LOWER_NUMBER_SPECIAL = /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&])[\S]+/;
+const REGEX_EMAIL = /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}/;
 const bcrypt = require('bcryptjs');
 
 const UsersService = {
@@ -8,6 +9,11 @@ const UsersService = {
             .where({ email })
             .first()
             .then(user => !!user)
+    },
+    validateEmail(email) {
+        if(!REGEX_EMAIL.test(email)) {
+            return `Please enter an email such as yourexamle@email.com`
+        }
     },
     validatePassword(password) {
         if (password.length < 8) {

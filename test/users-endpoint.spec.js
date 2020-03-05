@@ -120,6 +120,19 @@ describe.only('Users Endpoints', function() {
                 });
             });
 
+            it.only(`responds 400 error when email is not a proper email format containing an '@'`, () => {
+                const badEmail = {
+                    full_name: 'Test Name',
+                    password: 'ccAAkkee!!',
+                    email: 'testmail.com'
+                };
+
+                return supertest(app)
+                    .post('/api/users')
+                    .send(badEmail)
+                    .expect(400, { error: `Please enter an email such as yourexamle@email.com` })
+            });
+
             it(`responds 400 'Password must be longer than 8 characters' when empty password`, () => {
                 const shortPassword = {
                     full_name: 'Test Name',
