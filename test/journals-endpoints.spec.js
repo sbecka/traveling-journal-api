@@ -2,7 +2,7 @@ const knex = require('knex');
 const app = require('../src/app');
 const fixtures = require('./journals.fixtures');
 
-describe.only('Journals Endpoints', function() {
+describe('Journals Endpoints', function() {
 
     let db;
     const { testUsers, testJournals, testComments } = fixtures.makeJournalsFixtures();
@@ -110,7 +110,7 @@ describe.only('Journals Endpoints', function() {
         });
     });
 
-    describe.only('POST /api/journals', () => {
+    describe('POST /api/journals', () => {
 
         beforeEach(() => 
             fixtures.seedUsers(db, testUsers)

@@ -86,6 +86,11 @@ describe('Protected endpoints', function() {
             path: '/api/comments',
             method: supertest(app).post,
         },
+        {
+            name: 'DELETE /api/comments',
+            path: '/api/comments',
+            method: supertest(app).delete,
+        },
         // {
         //     name: 'POST /api/auth/refresh',
         //     path: '/api/auth/refresh',

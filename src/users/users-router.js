@@ -10,30 +10,56 @@ usersRouter
     .route('/')
     .post(jsonParser, (req, res, next) => {
         const { full_name, email, password } = req.body;
-        const newUser = { full_name, email };
 
-        for (const [key, value] of Object.entries(newUser)) {
-            if (value == null) {
+        for (const field of ['full_name', 'email', 'password']) {
+            if (!req.body[field]) {
                 return res.status(400).json({
-                    error: { message: `Missing '${key}' in request body` }
+                    error: `Missing '${field}' in request body`
                 })
             }
         }
 
-        newUser.password = password;
+        const passwordError = UsersService.validatePassword(password);
 
-        UsersService.createUser(
+        if (passwordError) {
+            return res.status(400).json({ error: passwordError })
+        }
+
+        UsersService.hasUserWithEmail(
             req.app.get('db'),
-            newUser
+            email
         )
-            .then(user => {
-                logger.info(`User with id ${user.id} created`);
-                res
-                    .status(201)
-                    .location(path.posix.join(req.originalUrl, `/${user.id}`))
-                    .json(UsersService.serializeUser(user))
+            .then(hasUserWithEmail => {
+                if (hasUserWithEmail) {
+                    return res.status(400).json({ error: `Email already taken` })
+                }
+
+                return UsersService.hashPassword(password)
+                    .then(hashedPassword => {
+                        const newUser = {
+                            full_name,
+                            email,
+                            password: hashedPassword,
+                            date_created: 'now()',
+                        };
+
+                        return UsersService.createUser(
+                            req.app.get('db'),
+                            newUser
+                        )
+                            .then(user => {
+                                logger.info(`User with id ${user.id} created`);
+                                res
+                                    .status(201)
+                                    .location(path.posix.join(req.originalUrl, `/${user.id}`))
+                                    .json(UsersService.serializeUser(user))
+                            })
+                            
+                    })
+                    
             })
             .catch(next)
+
     })
 
-    module.exports = usersRouter;
+module.exports = usersRouter;
