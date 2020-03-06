@@ -20,7 +20,7 @@ commentsRouter
             .catch(next)
     })
     .post(jsonParser, (req, res, next) => {
-        const { text, journal_id, author_id } = req.body;
+        const { text, journal_id } = req.body;
         const newComment = { text, journal_id };
 
         for (const [key, value] of Object.entries(newComment)) {
@@ -31,7 +31,7 @@ commentsRouter
             }
         }
 
-        newComment.author_id = author_id;
+        newComment.author_id = req.user.id;
         newComment.date_created = new Date();
 
         CommentsService.createComment(

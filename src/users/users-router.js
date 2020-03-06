@@ -1,13 +1,22 @@
 const path = require('path');
 const express = require('express');
 const UsersService = require('./users-service');
-
+const JournalsService = require('../journals/journals-service');
+const { requireAuth } = require('../middleware/jwt-auth');
 const usersRouter = express.Router();
 const jsonParser = express.json();
 const logger = require('../logger');
 
 usersRouter
     .route('/')
+    .get(requireAuth, (req, res, next) => {
+        const userId = req.user.id;
+        UsersService.getUserName(req.app.get('db'), userId)
+            .then(user => {
+                return res.json(user)
+            })
+            .catch(next)
+    })
     .post(jsonParser, (req, res, next) => {
         const { full_name, email, password } = req.body;
 
@@ -66,6 +75,20 @@ usersRouter
             })
             .catch(next)
 
+    })
+
+usersRouter
+    .route('/journals')
+    .get(requireAuth, (req, res, next) => {
+        const userId = req.user.id;
+        UsersService.getJournalsForUser(
+            req.app.get('db'), 
+            userId
+        )
+            .then(journals => {
+                res.json(journals.map(JournalsService.serializeJournal))
+            })
+            .catch(next)
     })
 
 module.exports = usersRouter;

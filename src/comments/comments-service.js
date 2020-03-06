@@ -47,7 +47,7 @@ const CommentsService = {
             text: xss(comment.text),
             journal_id: comment.journal_id,
             date_created: new Date(comment.date_created),
-            author: comment.author
+            author: comment.author_id
         }
     },
 };

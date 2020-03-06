@@ -18,7 +18,7 @@ journalsRouter
             .catch(next)
     })
     .post(jsonParser, (req, res, next) => {
-        const { title, location, content, start_date, end_date, author_id } = req.body;
+        const { title, location, content, start_date, end_date } = req.body;
         const newJournal = { title, location, content, start_date, end_date };
 
         for (const [key, value] of Object.entries(newJournal)) {
@@ -29,7 +29,7 @@ journalsRouter
             }
         }
 
-        newJournal.author_id = author_id; // user
+        newJournal.author_id = req.user.id; // user
         newJournal.date_created = new Date();
 
         JournalsService.createJournal(
@@ -65,14 +65,14 @@ journalsRouter
             .catch(next)
     })
     .patch(jsonParser, (req, res, next) => {
-        const { title, location, content, start_date, end_date, date_modified } = req.body;
-        const updateJournal = { title, location, content, start_date, end_date, date_modified };
+        const { title, location, content, start_date, end_date } = req.body;
+        const updateJournal = { title, location, content, start_date, end_date };
 
         const numberofFieldValues = Object.values(updateJournal).filter(Boolean).length;
         if (numberofFieldValues === 0) {
             return res.status(400).json({
                 error: {
-                    message: `Request body must have either 'title', 'location', 'content', 'start_date', 'end_date', or 'date_modified'`
+                    message: `Request body must have either 'title', 'location', 'content', 'start_date', or 'end_date'`
                 }
             })
         }

@@ -4,6 +4,45 @@ const REGEX_EMAIL = /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}/;
 const bcrypt = require('bcryptjs');
 
 const UsersService = {
+    getUserName(db, id) {
+        return db
+            .from('traveling_users AS usr')
+            .select(
+                'usr.full_name'
+            )
+            .where('usr.id', id)
+            .first()
+    },
+    getJournalsForUser(db, id) {
+        return  db
+        .from('traveling_journals AS j')
+        .select(
+            'j.id',
+            'j.title',
+            'j.location',
+            'j.content',
+            'j.start_date',
+            'j.end_date',
+            'j.date_created',
+            'j.date_modified',
+            'usr.full_name AS author',
+            db.raw(
+                `count(DISTINCT com) AS number_of_comments`
+            ),
+        )
+        .leftJoin(
+            'traveling_comments AS com',
+            'j.id',
+            'com.journal_id',
+        )
+        .leftJoin(
+            'traveling_users AS usr',
+            'j.author_id',
+            'usr.id',
+        )
+        .groupBy('j.id', 'usr.id')
+        .where('j.author_id', id)
+    },
     hasUserWithEmail(db, email) {
         return db('traveling_users')
             .where({ email })
