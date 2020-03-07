@@ -19,7 +19,6 @@ app.use(cors());
 //         origin: CLIENT_ORIGIN
 //     })
 // );
-
 app.use('/api/journals', journalsRouter);
 
 app.use('/api/comments', commentsRouter);

@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 const app = require('../src/app');
 const fixtures = require('./journals.fixtures');
 
-describe.only('Users Endpoints', function() {
+describe('Users Endpoints', function() {
 
     let db;
     const { testUsers, testJournals, testComments } = fixtures.makeJournalsFixtures();
@@ -236,7 +236,7 @@ describe.only('Users Endpoints', function() {
         
     });
 
-    describe.only('GET /api/users/journals', () => {
+    describe('GET /api/users/journals', () => {
 
         context('Given no journals are in database', () => {
             
@@ -252,7 +252,7 @@ describe.only('Users Endpoints', function() {
             });
         });
 
-        context.only(`Given journals in database`, () => {
+        context(`Given journals in database`, () => {
             beforeEach('insert user and journals', () => 
                 fixtures.seedTravelingJournalsTables(
                     db,

@@ -91,7 +91,17 @@ describe('Protected endpoints', function() {
             path: '/api/comments',
             method: supertest(app).delete,
         },
-        // {
+        {
+            name: 'GET /api/users',
+            path: '/api/users',
+            method: supertest(app).get,
+        },
+        {
+            name: 'GET /api/users/journals',
+            path: '/api/users/journals',
+            method: supertest(app).get,
+        },
+        // { work on expire token later
         //     name: 'POST /api/auth/refresh',
         //     path: '/api/auth/refresh',
         //     method: supertest(app).post

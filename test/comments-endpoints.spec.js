@@ -53,8 +53,7 @@ describe('Comments Endpoints', function() {
             const testUser = testUsers[0];
             const newComment = {
               text: 'Testing comment here',
-              journal_id: testJournal.id,
-              author_id: testUser.id
+              journal_id: testJournal.id
             };
             // console.log(newComment);
             return supertest(app)
@@ -67,7 +66,6 @@ describe('Comments Endpoints', function() {
                     expect(res.body).to.have.property('id')
                     expect(res.body.text).to.eql(newComment.text)
                     expect(res.body.journal_id).to.eql(newComment.journal_id)
-                    expect(res.body.author).to.eql(testUser.full_name)
                     expect(res.headers.location).to.eql(`/api/comments/${res.body.id}`)
                     const expectedDateCreated = new Date().toISOString()
                     const actualDate = new Date(res.body.date_created).toISOString()

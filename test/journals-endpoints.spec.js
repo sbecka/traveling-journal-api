@@ -426,7 +426,7 @@ describe('Journals Endpoints', function() {
                     .send({ badField: 'foobar' })
                     .expect(400, {
                         error: {
-                            message: `Request body must have either 'title', 'location', 'content', 'start_date', 'end_date', or 'date_modified'`
+                            message: `Request body must have either 'title', 'location', 'content', 'start_date', or 'end_date'`
                         }
                     })
             });
