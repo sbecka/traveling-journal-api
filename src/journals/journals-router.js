@@ -53,7 +53,7 @@ journalsRouter
     .all(checkJournalExists)
     .get((req, res) => {
         res.json(JournalsService.serializeJournal(res.journal))
-    })
+    }) 
     .delete((req, res, next) => {
         JournalsService.deleteJournal(
             req.app.get('db'),
