@@ -155,6 +155,20 @@ function seedTravelingJournalsTables(db, users, journals, comments=[]) {
     });
 };
 
+function seedUsers(db, users) {
+    const preppedUsers = users.map(user => ({
+        ...user,
+        password: bcrypt.hashSync(user.password, 1)
+    }));
+    return db.into('traveling_users').insert(preppedUsers)
+        .then(() => 
+            db.raw(
+                `SELECT setval('traveling_users_id_seq', ?)`,
+                [users[users.length - 1].id]
+            )
+        )
+};
+
 function makeExpectedJournal(users, journal, comments=[]) {
     const author = users.find(user => user.id === journal.author_id);
     const number_of_comments = comments.filter(comment => comment.journal_id === journal.id).length;
@@ -186,20 +200,6 @@ function makeExpectedJournalComments(users, journalId, comments) {
             author: author.full_name
         }
     });
-};
-
-function seedUsers(db, users) {
-    const preppedUsers = users.map(user => ({
-        ...user,
-        password: bcrypt.hashSync(user.password, 1)
-    }));
-    return db.into('traveling_users').insert(preppedUsers)
-        .then(() => 
-            db.raw(
-                `SELECT setval('traveling_users_id_seq', ?)`,
-                [users[users.length - 1].id]
-            )
-        )
 };
 
 function makeMaliciousJournal(user) {
@@ -249,9 +249,9 @@ module.exports = {
     makeTestComments,
     makeJournalsFixtures,
     seedTravelingJournalsTables,
+    seedUsers,
     makeExpectedJournal,
     makeExpectedJournalComments,
-    seedUsers,
     makeMaliciousJournal,
     seedMaliciousJournal,
     makeAuthHeader

@@ -6,7 +6,7 @@ const fixtures = require('./journals.fixtures');
 describe.only('Users Endpoints', function() {
 
     let db;
-    const { testUsers } = fixtures.makeJournalsFixtures();
+    const { testUsers, testJournals, testComments } = fixtures.makeJournalsFixtures();
     const testUser = testUsers[0];
 
     before('make knex instance', () => {
@@ -39,9 +39,30 @@ describe.only('Users Endpoints', function() {
         )
     });
 
+    describe('GET /api/users', () => {
+        context(`Get User full_name`, () => {
+
+            beforeEach(() => 
+                fixtures.seedUsers(db, testUsers)
+            );
+
+            const expectedName = { full_name: testUsers[0].full_name };
+            
+            it(`reponds 200 with user full_name`, () => {
+                return supertest(app)
+                    .get('/api/users')
+                    .set(`Authorization`, fixtures.makeAuthHeader(testUsers[0]))
+                    .expect(200, expectedName)
+                    .expect(res => {
+                        expect(res).to.be.an('object')
+                    })
+            });
+        });
+    });
+
     describe('POST /api/users', () => {
 
-        context.only(`Create User`, () => {
+        context(`Create User`, () => {
 
             it(`responds 201, creates new user, returns new user, stores password`, function() {
                 this.retries(3); // logs User with id created
@@ -120,7 +141,7 @@ describe.only('Users Endpoints', function() {
                 });
             });
 
-            it.only(`responds 400 error when email is not a proper email format containing an '@'`, () => {
+            it(`responds 400 error when email is not a proper email format containing an '@'`, () => {
                 const badEmail = {
                     full_name: 'Test Name',
                     password: 'ccAAkkee!!',
@@ -213,6 +234,54 @@ describe.only('Users Endpoints', function() {
         });
 
         
+    });
+
+    describe.only('GET /api/users/journals', () => {
+
+        context('Given no journals are in database', () => {
+            
+            beforeEach(() => 
+                fixtures.seedUsers(db, testUsers)
+            );
+
+            it(`reponds 200 with empty array`, () => {
+                return supertest(app)
+                    .get('/api/users/journals')
+                    .set(`Authorization`, fixtures.makeAuthHeader(testUsers[0]))
+                    .expect(200, [])
+            });
+        });
+
+        context.only(`Given journals in database`, () => {
+            beforeEach('insert user and journals', () => 
+                fixtures.seedTravelingJournalsTables(
+                    db,
+                    testUsers,
+                    testJournals,
+                    testComments
+                )
+            );
+
+            it(`responds with 200 and user's journals`, () => {
+
+                const allJournals = testJournals.map(journal => 
+                    fixtures.makeExpectedJournal(
+                        testUsers,
+                        journal,
+                        testComments
+                    )
+                );
+
+                const expectedJournals = allJournals.filter(journal => journal.author === testUser.full_name)
+                // console.log(testUser);
+                // console.log(expectedJournals);
+
+                return supertest(app)
+                    .get('/api/users/journals')
+                    .set(`Authorization`, fixtures.makeAuthHeader(testUsers[0]))
+                    .expect(200, expectedJournals)
+            });
+        });
     });
 
 });
