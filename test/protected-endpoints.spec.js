@@ -101,11 +101,11 @@ describe('Protected endpoints', function() {
             path: '/api/users/journals',
             method: supertest(app).get,
         },
-        // { work on expire token later
-        //     name: 'POST /api/auth/refresh',
-        //     path: '/api/auth/refresh',
-        //     method: supertest(app).post
-        // }
+        {
+            name: 'POST /api/auth/refresh',
+            path: '/api/auth/refresh',
+            method: supertest(app).post
+        }
     ];
 
     protectedEndpoints.forEach(endpoint => {

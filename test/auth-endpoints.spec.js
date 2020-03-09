@@ -1,10 +1,9 @@
 const knex = require('knex');
 const jwt = require('jsonwebtoken');
-
 const app = require('../src/app');
 const fixtures = require('./journals.fixtures');
 
-describe.only('Auth Endpoints', function() {
+describe('Auth Endpoints', function() {
     let db;
 
     const { testUsers } = fixtures.makeJournalsFixtures();
@@ -96,6 +95,7 @@ describe.only('Auth Endpoints', function() {
                 process.env.JWT_SECRET,
                 {
                     subject: testUser.email,
+                    expiresIn: process.env.JWT_EXPIRY,
                     algorithm: 'HS256'
                 }
             );
@@ -103,6 +103,33 @@ describe.only('Auth Endpoints', function() {
             return supertest(app)
                 .post('/api/auth/login')
                 .send(validLogin)
+                .expect(200, {
+                    authToken: expectedToken
+                })
+        });
+    });
+
+    describe.only(`POST /api/auth/refresh`, () => {
+        beforeEach('insert users', () => {
+            fixtures.seedUsers(
+                db,
+                testUsers
+            )
+        });
+
+        it(`responds 200 and JWT auth token using secret`, () => {
+            const expectedToken = jwt.sign(
+                { user_id: testUser.id },
+                process.env.JWT_SECRET,
+                {
+                    subject: testUser.email,
+                    expiresIn: process.env.JWT_EXPIRY,
+                    algorithm: 'HS256'
+                }
+            );
+            return supertest(app)
+                .post('/api/auth/refresh')
+                .set('Authorization', fixtures.makeAuthHeader(testUser))
                 .expect(200, {
                     authToken: expectedToken
                 })
