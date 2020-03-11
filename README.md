@@ -1,6 +1,10 @@
 # Traveling Journal API
 
+### Name of app: Traveling Journal
+
 ### Live app: https://traveling-journal.now.sh/
+
+### App repo: https://github.com/sPro1ly0/traveling-journal-app
 
 ## Summary
 
