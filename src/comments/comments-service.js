@@ -36,11 +36,6 @@ const CommentsService = {
       .where('com.id', id)
       .first();
   },
-  deleteComment (db, id) {
-    return db('traveling_comments')
-      .where({ id })
-      .delete();
-  },
   serializeComment (comment) {
     return {
       id: comment.id,

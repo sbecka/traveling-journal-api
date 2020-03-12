@@ -5,7 +5,7 @@ const fixtures = require('./journals.fixtures');
 
 describe('Comments Endpoints', function () {
   let db;
-  const { testUsers, testJournals, testComments } = fixtures.makeJournalsFixtures();
+  const { testUsers, testJournals } = fixtures.makeJournalsFixtures();
 
   before('make knex instance', () => {
     db = knex({
@@ -47,21 +47,19 @@ describe('Comments Endpoints', function () {
     );
 
     it('responds with 201, create comment, and returns the new comment', function () {
-      this.retries(3); // help log comment with id is created
+      this.retries(3); // when using winston, log comment with id is created
       const testJournal = testJournals[0];
       const testUser = testUsers[0];
       const newComment = {
         text: 'Testing comment here',
         journal_id: testJournal.id
       };
-      // console.log(newComment);
       return supertest(app)
         .post('/api/comments')
         .set('Authorization', fixtures.makeAuthHeader(testUsers[0]))
         .send(newComment)
         .expect(201)
         .expect(res => {
-          // console.log(res.body)
           expect(res.body).to.have.property('id');
           expect(res.body.text).to.eql(newComment.text);
           expect(res.body.journal_id).to.eql(newComment.journal_id);
@@ -105,52 +103,6 @@ describe('Comments Endpoints', function () {
           .send(newComment)
           .expect(400, {
             error: `Missing '${field}' in request body`
-          });
-      });
-    });
-  });
-
-  describe('DELETE /api/comments/:comment_id', () => {
-    context('Given no comments in database', () => {
-      beforeEach(() =>
-        fixtures.seedUsers(db, testUsers)
-      );
-
-      // eslint-disable-next-line quotes
-      it(`responds 404 when comment doesn't exist`, () => {
-        const commentId = 123;
-        return supertest(app)
-          .delete(`/api/comments/${commentId}`)
-          .set('Authorization', fixtures.makeAuthHeader(testUsers[0]))
-          .expect(404, {
-            // eslint-disable-next-line quotes
-            error: { message: `Comment doesn't exist` }
-          });
-      });
-    });
-
-    context('Given comments are in database', () => {
-      beforeEach('insert journals and comments', () =>
-        fixtures.seedTravelingJournalsTables(
-          db,
-          testUsers,
-          testJournals,
-          testComments
-        )
-      );
-
-      it('responds with 204 and deletes the comment', () => {
-        const deleteId = 1;
-        const expectedComments = testComments.filter(comment => comment.id !== deleteId);
-
-        return supertest(app)
-          .delete(`/api/comments/${deleteId}`)
-          .set('Authorization', fixtures.makeAuthHeader(testUsers[0]))
-          .expect(204)
-          .then(res => {
-            supertest(app)
-              .get('/api/comments')
-              .expect(expectedComments);
           });
       });
     });

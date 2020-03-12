@@ -164,7 +164,7 @@ Response example:
 }
 ```
 
-#### Error Responses: 400 BAD REQUEST
+#### Error Response: 400 BAD REQUEST
 
 Response example for missing one required field:
 ```json
@@ -357,7 +357,7 @@ Header: Location at /api/journals/:journal_id
 }
 ```
 
-#### Error Responses: 400 BAD REQUEST
+#### Error Response: 400 BAD REQUEST
 
 Response example for missing one required field:
 ```json
@@ -412,7 +412,7 @@ Response example:
     }
 ]
 ```
-#### Error Responses: 404 NOT FOUND
+#### Error Response: 404 NOT FOUND
 
 If there is no journal with given id.
 
@@ -425,7 +425,7 @@ Response:
 }
 ```
 
-#### Error Responses: 401 UNAUTHORIZED REQUEST
+#### Error Response: 401 UNAUTHORIZED REQUEST
 
 If no authorization token provided.
 
@@ -451,7 +451,7 @@ URL- :journal_id is the ID of the journal.
 
 #### Success Response: 204 NO CONTENT
 
-#### Error Responses: 404 NOT FOUND
+#### Error Response: 404 NOT FOUND
 
 If there is no journal with given id.
 
@@ -464,7 +464,7 @@ Response:
 }
 ```
 
-#### Error Responses: 401 UNAUTHORIZED REQUEST
+#### Error Response: 401 UNAUTHORIZED REQUEST
 
 If no authorization token provided.
 
@@ -503,7 +503,7 @@ Request example:
 
 #### Success Response: 204 NO CONTENT
 
-#### Error Responses: 404 NOT FOUND
+#### Error Response: 404 NOT FOUND
 
 If there is no journal with given id.
 
@@ -516,7 +516,7 @@ Response:
 }
 ```
 
-#### Error Responses: 400 BAD REQUEST
+#### Error Response: 400 BAD REQUEST
 
 Response example for missing one required field:
 ```json
@@ -572,7 +572,7 @@ URL- :journal_id is the ID of the journal.
 ]
 ```
 
-#### Error Responses: 404 NOT FOUND
+#### Error Response: 404 NOT FOUND
 
 If there is no journal with given id.
 
@@ -585,7 +585,7 @@ Response:
 }
 ```
 
-#### Error Responses: 400 BAD REQUEST
+#### Error Response: 400 BAD REQUEST
 
 Response example for missing one required field:
 ```json
@@ -620,7 +620,7 @@ Response:
 
 ### Comments Endpoints
 
-All comments endpoints are protected and require authorization token with requests.
+Comments endpoint is protected and requires authorization token with requests.
 
 **POST /api/comments (Protected)** - Add a comment *Only comments endpoint used in traveling journal app.
 
@@ -648,7 +648,7 @@ Header: Location at /api/comments/:comment_id
 }
 ```
 
-#### Error Responses: 400 BAD REQUEST
+#### Error Response: 400 BAD REQUEST
 
 Response example for missing one required field:
 ```json
@@ -660,97 +660,6 @@ Response example for missing one required field:
 ```
 
 #### Error Response: 401 UNAUTHORIZED REQUEST
-
-If no authorization token provided.
-
-Response:
-```json
-{
-    "error": "Missing bearer token"
-}
-```
-
-If authorization token is not valid.
-
-Response:
-```json
-{
-    "error": "Unauthorized request"
-}
-```
-
-
-**GET /api/comments (Protected)** - Get all comments
-
-#### Success Response: 200 OK
-
-```json
-[
-   {
-        "id": 1,
-        "text": "Ipsum!",
-        "journal_id": 1,
-        "date_created": "2020-02-19 20:00:00",
-        "author": "John Doe"
-   },
-   {
-        "id": 2,
-        "text": "Ipsum dolorium!",
-        "journal_id": 3,
-        "date_created": "2020-02-21 20:00:00",
-        "author": "Luke Sky"
-   },
-   {
-        "id": 3,
-        "text": "Ipsum dolor!",
-        "journal_id": 2,
-        "date_created": "2020-02-22 20:00:00",
-        "author": "Jane Lane"
-   }
-]
-```
-
-#### Error Response: 401 UNAUTHORIZED REQUEST
-
-If no authorization token provided.
-
-Response:
-```json
-{
-    "error": "Missing bearer token"
-}
-```
-
-If authorization token is not valid.
-
-Response:
-```json
-{
-    "error": "Unauthorized request"
-}
-```
-
-
-**DELETE /api/comments/:comment_id (Protected)** - Delete a specific comment by id
-
-URL- :comment_id is the ID of the journal.
-
-#### Success Response: 204 NO CONTENT
-
-#### Error Responses: 404 NOT FOUND
-
-If there is no comment with given id.
-
-Response:
-```json
-{
-    "error": { 
-        "message": "Comment doesn't exist" 
-     }
-}
-```
-
-#### Error Responses: 401 UNAUTHORIZED REQUEST
 
 If no authorization token provided.
 

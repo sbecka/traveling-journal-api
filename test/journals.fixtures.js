@@ -103,7 +103,7 @@ function makeTestComments (users, journals) {
     {
       id: 2,
       text: 'Lorem ipsum dolor!',
-      journal_id: journals[0].id,
+      journal_id: journals[2].id,
       author_id: users[1].id,
       date_created: new Date('2020-01-22T16:28:32.615Z')
     },
@@ -191,7 +191,7 @@ function makeExpectedJournal (users, journal, comments = []) {
     author: author.full_name
   };
 };
-// check this
+
 function makeExpectedJournalComments (users, journalId, comments) {
   const expectedComments = comments.filter(comment => comment.journal_id === journalId);
 
@@ -199,9 +199,9 @@ function makeExpectedJournalComments (users, journalId, comments) {
     const commentUser = users.find(user => user.id === comment.author_id);
     return {
       id: commentUser.id,
-      text: commentUser.text,
-      date_created: commentUser.date_created.toISOString(),
-      journal_id: commentUser.journal_id,
+      text: comment.text,
+      date_created: comment.date_created.toISOString(),
+      journal_id: comment.journal_id,
       author: commentUser.full_name
     };
   });

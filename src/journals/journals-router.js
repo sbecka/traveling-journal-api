@@ -6,7 +6,6 @@ const { requireAuth } = require('../middleware/jwt-auth');
 
 const journalsRouter = express.Router();
 const jsonParser = express.json();
-const logger = require('../logger');
 
 journalsRouter
   .route('/')
@@ -38,7 +37,6 @@ journalsRouter
       newJournal
     )
       .then(journal => {
-        logger.info(`Journal with id ${journal.id} created`);
         res
           .status(201)
           .location(path.posix.join(req.originalUrl, `/${journal.id}`))
@@ -86,7 +84,6 @@ journalsRouter
       updateJournal
     )
       .then(numberOfRowsAffected => {
-        logger.info(`Journal with id ${req.params.journal_id} updated`);
         res.status(204).end();
       })
       .catch(next);

@@ -5,20 +5,10 @@ const { requireAuth } = require('../middleware/jwt-auth');
 
 const commentsRouter = express.Router();
 const jsonParser = express.json();
-const logger = require('../logger');
-
-// app only post comments, but I would like to add delete a comment too
 
 commentsRouter
   .route('/')
   .all(requireAuth)
-  .get((req, res, next) => {
-    CommentsService.getAllComments(req.app.get('db'))
-      .then(comments => {
-        res.json(comments.map(CommentsService.serializeComment));
-      })
-      .catch(next);
-  })
   .post(jsonParser, (req, res, next) => {
     // eslint-disable-next-line camelcase
     const { text, journal_id } = req.body;
@@ -40,42 +30,10 @@ commentsRouter
       newComment
     )
       .then(comment => {
-        logger.info(`Comment with id ${comment.id} created`);
         res
           .status(201)
           .location(path.posix.join(req.originalUrl, `/${comment.id}`))
           .json(CommentsService.serializeComment(comment));
-      })
-      .catch(next);
-  });
-
-commentsRouter
-  .route('/:comment_id')
-  .all(requireAuth)
-  .all((req, res, next) => {
-    CommentsService.getById(
-      req.app.get('db'),
-      req.params.comment_id
-    )
-      .then(comment => {
-        if (!comment) {
-          return res.status(404).json({
-            // eslint-disable-next-line quotes
-            error: { message: `Comment doesn't exist` }
-          });
-        }
-        res.comment = comment;
-        next();
-      })
-      .catch(next);
-  })
-  .delete((req, res, next) => {
-    CommentsService.deleteComment(
-      req.app.get('db'),
-      req.params.comment_id
-    )
-      .then(numberofRowsAffected => {
-        res.status(204).end();
       })
       .catch(next);
   });

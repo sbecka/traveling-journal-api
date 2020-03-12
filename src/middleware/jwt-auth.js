@@ -27,7 +27,6 @@ function requireAuth (req, res, next) {
         next();
       })
       .catch(error => {
-        console.error(error);
         next(error);
       });
   } catch (error) {

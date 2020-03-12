@@ -52,6 +52,7 @@ const JournalsService = {
       .select(
         'com.id',
         'com.text',
+        'com.journal_id',
         'com.date_created',
         'usr.full_name AS author'
       )

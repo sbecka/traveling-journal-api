@@ -62,7 +62,7 @@ describe('Users Endpoints', function () {
   describe('POST /api/users', () => {
     context('Create User', () => {
       it('responds 201, creates new user, returns new user, stores password', function () {
-        this.retries(3); // logs User with id created
+        this.retries(3); // if using winston, logs User with id created
 
         const newUser = {
           full_name: 'Test Name',
@@ -75,7 +75,6 @@ describe('Users Endpoints', function () {
           .send(newUser)
           .expect(201)
           .expect(res => {
-            // console.log(res.body)
             expect(res.body).to.have.property('id');
             expect(res.body.full_name).to.eql(newUser.full_name);
             expect(res.body.email).to.eql(newUser.email);

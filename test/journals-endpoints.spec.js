@@ -3,7 +3,7 @@ const knex = require('knex');
 const app = require('../src/app');
 const fixtures = require('./journals.fixtures');
 
-describe('Journals Endpoints', function () {
+describe.only('Journals Endpoints', function () {
   let db;
   const { testUsers, testJournals, testComments } = fixtures.makeJournalsFixtures();
 
@@ -112,7 +112,7 @@ describe('Journals Endpoints', function () {
     );
 
     it('responds with 201 and creates a new journal, then returns new journal', function () {
-      this.retries(5); // log will show journal with id 1 created
+      this.retries(5); // when using winston, log will show journal with id 1 created
       const testUser = testUsers[0];
       const newJournal = {
         title: 'Lovely Lakes',
@@ -362,7 +362,7 @@ describe('Journals Endpoints', function () {
       );
 
       it('responds with 204 and updates the journal', function () {
-        this.retries(3); // logger logs journal with id updated
+        this.retries(3); // when using winston, logs journal with id updated
 
         const updateId = 1;
         const updatedJournal = {
@@ -392,7 +392,6 @@ describe('Journals Endpoints', function () {
           ...updatedJournal
         };
 
-        // console.log(expectedJournal);
         return supertest(app)
           .patch(`/api/journals/${updateId}`)
           .set('Authorization', fixtures.makeAuthHeader(testUsers[0]))
@@ -421,7 +420,7 @@ describe('Journals Endpoints', function () {
       });
 
       it('responds with 204 when updating only a given field', function () {
-        this.retries(3); // logger logs journal with id updated
+        this.retries(3); // when using winston, logs journal with id updated
 
         const updateId = 1;
         const updateJournal = {
@@ -484,7 +483,7 @@ describe('Journals Endpoints', function () {
       });
     });
 
-    context('Given journal with comments are in database', () => {
+    context.only('Given journal with comments are in database', () => {
       beforeEach('insert journals', () =>
         fixtures.seedTravelingJournalsTables(
           db,
@@ -495,7 +494,7 @@ describe('Journals Endpoints', function () {
       );
 
       it('responds with 200 and given matching journal id and comments', () => {
-        const journalId = 2;
+        const journalId = 1;
         const expectedComments = fixtures.makeExpectedJournalComments(
           testUsers,
           journalId,

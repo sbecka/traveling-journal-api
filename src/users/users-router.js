@@ -5,7 +5,6 @@ const JournalsService = require('../journals/journals-service');
 const { requireAuth } = require('../middleware/jwt-auth');
 const usersRouter = express.Router();
 const jsonParser = express.json();
-const logger = require('../logger');
 
 usersRouter
   .route('/')
@@ -64,7 +63,6 @@ usersRouter
               newUser
             )
               .then(user => {
-                logger.info(`User with id ${user.id} created`);
                 res
                   .status(201)
                   .location(path.posix.join(req.originalUrl, `/${user.id}`))
