@@ -98,7 +98,7 @@ Response example:
 
 ### Users Information Endpoints
 
-**Get a user's information:** GET /api/users `Protected`
+**GET /api/users (Protected)** - Get a user's information
 
 #### Success Response: 200 OK
 
@@ -128,7 +128,7 @@ Response:
 }
 ```
 
-**Create a user:** POST /api/users
+**POST /api/users** - Create a user
 
 Required fields: full_name, email, password
 
