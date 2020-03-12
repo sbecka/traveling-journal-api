@@ -14,9 +14,13 @@ The Traveling Journal allows users to write about any places they have been and 
 
 ## API Documentation
 
+Protected Endpoints must have a valid authorization token with the request.
+
 ### Authentication Endpoints
 
 **Login to a user account and get authorization token:** POST /api/auth/login
+
+Required fields: email and password
 
 Request body template:
 ```json
@@ -34,7 +38,7 @@ Request body example:
 }
 ```
 
-#### Success Response 200 OK
+#### Success Response: 200 OK
 
 Response example:
 ```json
@@ -43,7 +47,7 @@ Response example:
 }
 ```
 
-#### Error Response 400 BAD REQUEST
+#### Error Response: 400 BAD REQUEST
 
 Response example for invalid email or password:
 ```json
@@ -76,15 +80,174 @@ Response example:
 }
 ```
 
+
 ### Users Information Endpoints
 
-**Get a user's info:**
+**Get a user's information:** GET /api/users
 
-GET /api/users
+Protected endpoint
 
-**Create a user account:**
+#### Success Response: 200 OK
 
-POST /api/users
+Response example:
+```json
+{
+    "full_name": "John Doe"
+}
+```
+#### Error Response: 401 UNAUTHORIZED REQUEST
+
+If no authorization token provided.
+
+Response:
+```json
+{
+    "error": "Missing bearer token"
+}
+```
+
+If authorization token is not valid.
+
+Response:
+```json
+{
+    "error": "Unauthorized request"
+}
+```
+
+**Create a user:** POST /api/users
+
+Required fields: full_name, email, password
+
+Request body template:
+```json
+{
+    "full_name": "user full name",
+    "email": "valid email address",
+    "password": "valid password"
+}
+```
+
+Request body example:
+```json
+{
+    "full_name": "John Doe",
+    "email": "example@mail.com",
+    "password": "123Abc4!"
+}
+```
+
+#### Success Response: 201 CREATED
+
+Header: Location at /api/users/:user_id
+
+Response example:
+```json
+{
+    "id": "1",
+    "full_name": "John Doe",
+    "email": "example@mail.com",
+    "date_created": "2019-04-14 20:00:00"
+}
+```
+
+#### Error Responses: 400 BAD REQUEST
+
+Response example for missing one required field:
+```json
+{
+    "error": "Missing 'email' in request body"
+}
+```
+
+Response example for existing user with same email address:
+```json
+{
+    "error": "Email already taken"
+}
+```
+
+Response examples for wrong password format:
+```json
+{
+    "error": "Password must contain 1 upper case, lower case, number, and special character"
+}
+```
+```json
+{
+    "error": "Password must be longer than 8 characters"
+}
+```
+```json
+{
+    "error": "Password must not start or end with empty spaces"
+}
+```
+
+Response example for wrong email format:
+```json
+{
+    "error": "Please enter an email such as yourexamle@email.com"
+}
+```
+
+**Get a user's journals:** GET /api/users/journals
+
+Protected endpoint
+
+#### Success Response: 200 OK
+
+Response example:
+```json
+[
+    {
+        "id": 1,
+        "title": "Example Title",
+        "location": "Example Location",
+        "content": "Ipsum ipsum ipsum ipsum ipsum",
+        "start_date": "2019-04-14 20:00:00",
+        "end_date": "2019-04-14 20:00:00",
+        "date_created": "2020-03-11 20:00:00",
+        "date_modified": "2020-03-12 20:00:00",
+        "number_of_comments": 2,
+        "author": "John Doe"
+    },
+    {
+        "id": 3,
+        "title": "Example Title",
+        "location": "Example Location",
+        "content": "Ipsum ipsum ipsum ipsum ipsum",
+        "start_date": "2019-01-14 20:00:00",
+        "end_date": "2019-02-14 20:00:00",
+        "date_created": "2020-03-01 20:00:00",
+        "date_modified": "2020-03-11 20:00:00",
+        "number_of_comments": 0,
+        "author": "John Doe"
+    }
+]
+```
+
+#### Error Response: 401 UNAUTHORIZED REQUEST
+
+If no authorization token provided.
+
+Response:
+```json
+{
+    "error": "Missing bearer token"
+}
+```
+
+If authorization token is not valid.
+
+Response:
+```json
+{
+    "error": "Unauthorized request"
+}
+```
+
+
 
 ### Journals Endpoints
 
