@@ -251,29 +251,141 @@ Response:
 
 ### Journals Endpoints
 
-**Get all journals:**
+All journals endpoints are protected and require authorization token with requests.
 
-GET /api/journals
+**Get all journals:** GET /api/journals
 
-**Add a journal:**
+#### Success Response: 200 OK
 
-POST /api/journals
+Response example:
+```json
+[
+    {
+        "id": 1,
+        "title": "Example Title",
+        "location": "Example Location",
+        "content": "Ipsum ipsum ipsum ipsum ipsum",
+        "start_date": "2019-04-14 20:00:00",
+        "end_date": "2019-04-14 20:00:00",
+        "date_created": "2020-03-11 20:00:00",
+        "date_modified": "2020-03-12 20:00:00",
+        "number_of_comments": 2,
+        "author": "John Doe"
+    },
+    {
+        "id": 2,
+        "title": "Example Title",
+        "location": "Example Location",
+        "content": "Ipsum ipsum ipsum ipsum ipsum",
+        "start_date": "2019-01-14 20:00:00",
+        "end_date": "2019-02-14 20:00:00",
+        "date_created": "2020-03-01 20:00:00",
+        "date_modified": "2020-03-11 20:00:00",
+        "number_of_comments": 0,
+        "author": "Jane Lane"
+    },
+    {
+        "id": 3,
+        "title": "Example Title",
+        "location": "Example Location",
+        "content": "Ipsum ipsum ipsum ipsum ipsum",
+        "start_date": "2019-04-14 20:00:00",
+        "end_date": "2019-04-14 20:00:00",
+        "date_created": "2020-03-11 20:00:00",
+        "date_modified": "2020-03-12 20:00:00",
+        "number_of_comments": 2,
+        "author": "John Doe"
+    },
+    {
+        "id": 4,
+        "title": "Example Title",
+        "location": "Example Location",
+        "content": "Ipsum ipsum ipsum ipsum ipsum",
+        "start_date": "2019-01-14 20:00:00",
+        "end_date": "2019-02-14 20:00:00",
+        "date_created": "2020-03-01 20:00:00",
+        "date_modified": "2020-03-11 20:00:00",
+        "number_of_comments": 0,
+        "author": "Jack Scott"
+    }
+]
+```
 
-**Get a specific journal by id:**
+**Add a journal:** POST /api/journals
 
-GET /api/journals/:journal_id
+Required fields: title, location, content, start_date, end_date
 
-**Delete a specific journal by id:**
+Request example:
+```json
+{
+        "title": "Example Title",
+        "location": "Example Location",
+        "content": "Ipsum ipsum ipsum ipsum ipsum",
+        "start_date": "2019-04-14 20:00:00",
+        "end_date": "2019-04-14 20:00:00"
+}
+```
 
-DELETE /api/journals/:journal_id
+#### Success Response: 201 CREATED
 
-**Edit a specific journal by id:**
+Header: Location at /api/journals/:journal_id
 
-PATCH /api/journals/:journal_id
+```json
+{
+        "id": 1,
+        "title": "Example Title",
+        "location": "Example Location",
+        "content": "Ipsum ipsum ipsum ipsum ipsum",
+        "start_date": "2019-04-14 20:00:00",
+        "end_date": "2019-04-14 20:00:00",
+        "date_created": "2020-03-11 20:00:00",
+        "date_modified": null,
+        "number_of_comments": 0,
+        "author": "John Doe"
+}
+```
 
-**Get a specific journal by id and its comments:**
+#### Error Responses: 400 BAD REQUEST
 
-GET /api/journals/:journal_id/comments
+Response example for missing one required field:
+```json
+{
+    "error": {
+        "message": "Missing 'title' in request body"
+    }
+}
+```
+
+#### Error Response: 401 UNAUTHORIZED REQUEST
+
+If no authorization token provided.
+
+Response:
+```json
+{
+    "error": "Missing bearer token"
+}
+```
+
+If authorization token is not valid.
+
+Response:
+```json
+{
+    "error": "Unauthorized request"
+}
+```
+
+
+**Get a specific journal by id:** GET /api/journals/:journal_id
+
+**Delete a specific journal by id:** DELETE /api/journals/:journal_id
+
+**Edit a specific journal by id:** PATCH /api/journals/:journal_id
+
+**Get a specific journal by id and its comments:** GET /api/journals/:journal_id/comments
+
+
 
 ### Comments Endpoints
 
