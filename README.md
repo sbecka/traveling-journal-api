@@ -373,7 +373,7 @@ Response:
 
 **Get a specific journal by id:** GET /api/journals/:journal_id `Protected`
 
-URL: :journal_id is the ID of the journal.
+URL- :journal_id is the ID of the journal.
 
 #### Success Response: 200 OK
 
@@ -429,7 +429,7 @@ Response:
 
 **Delete a specific journal by id:** DELETE /api/journals/:journal_id `Protected`
 
-URL: :journal_id is the ID of the journal.
+URL- :journal_id is the ID of the journal.
 
 #### Success Response: 204 NO CONTENT
 
@@ -468,6 +468,8 @@ Response:
 
 **Update specific journal by id:** PATCH /api/journals/:journal_id `Protected`
 
+URL- :journal_id is the ID of the journal.
+
 Required fields: title, location, content, start_date, end_date
 
 Request example:
@@ -482,6 +484,19 @@ Request example:
 ```
 
 #### Success Response: 204 NO CONTENT
+
+#### Error Responses: 404 NOT FOUND
+
+If there is not journal with given id.
+
+Response:
+```json
+{
+    "error": { 
+        "message": "Journal doesn't exist" 
+     }
+}
+```
 
 #### Error Responses: 400 BAD REQUEST
 
@@ -516,25 +531,40 @@ Response:
 
 **Get a specific journal by id and its comments:** GET /api/journals/:journal_id/comments `Protected`
 
+URL- :journal_id is the ID of the journal.
+
 #### Success Response: 200 OK
 
 ```json
 [
    {
-        id: 1,
-        text: "Ipsum!",
-        journal_id: 1,
-        date_created: "2020-02-19 20:00:00",
-        author: "John Doe"
+        "id": 1,
+        "text": "Ipsum!",
+        "journal_id": 1,
+        "date_created": "2020-02-19 20:00:00",
+        "author": "John Doe"
    },
    {
-        id: 3,
-        text: "Ipsum dolor!",
-        journal_id: 1,
-        date_created: "2020-02-22 20:00:00",
-        author: "Jane Lane"
+        "id": 3,
+        "text": "Ipsum dolor!",
+        "journal_id": 1,
+        "date_created": "2020-02-22 20:00:00",
+        "author": "Jane Lane"
    }
 ]
+```
+
+#### Error Responses: 404 NOT FOUND
+
+If there is not journal with given id.
+
+Response:
+```json
+{
+    "error": { 
+        "message": "Journal doesn't exist" 
+     }
+}
 ```
 
 #### Error Responses: 400 BAD REQUEST
