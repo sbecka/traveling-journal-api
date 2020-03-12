@@ -16,6 +16,22 @@ The Traveling Journal allows users to write about any places they have been and 
 
 Protected Endpoints must have a valid authorization token with the request.
 
+All Protected Endpoints Used in Traveling Journal App:
+
+<ul>
+  <li>POST /api/auth/refresh</li>
+  <li>GET /api/users</li>
+  <li>GET /api/users/journals</li>
+  <li>GET /api/journals</li>
+  <li>GET /api/journals/:journal_id</li>
+  <li>POST /api/journals</li>
+  <li>DELETE /api/journals/:journal_id</li>
+  <li>PATCH /api/journals/:journal_id</li>
+  <li>GET /api/journals/:journal_id/comments</li>
+  <li>POST /api/comments</li>
+</ul>
+
+---
 ### Authentication Endpoints
 
 **Login to a user account and get authorization token:** POST /api/auth/login
@@ -77,7 +93,7 @@ Response example:
     "authToken": "jfhaiuiu2352svngerlseimg988343y8423fefwe834"
 }
 ```
-
+---
 
 ### Users Information Endpoints
 
@@ -240,7 +256,7 @@ Response:
     "error": "Unauthorized request"
 }
 ```
-
+---
 
 
 ### Journals Endpoints
@@ -396,7 +412,7 @@ Response example:
 ```
 #### Error Responses: 404 NOT FOUND
 
-If there is not journal with given id.
+If there is no journal with given id.
 
 Response:
 ```json
@@ -435,7 +451,7 @@ URL- :journal_id is the ID of the journal.
 
 #### Error Responses: 404 NOT FOUND
 
-If there is not journal with given id.
+If there is no journal with given id.
 
 Response:
 ```json
@@ -487,7 +503,7 @@ Request example:
 
 #### Error Responses: 404 NOT FOUND
 
-If there is not journal with given id.
+If there is no journal with given id.
 
 Response:
 ```json
@@ -556,7 +572,7 @@ URL- :journal_id is the ID of the journal.
 
 #### Error Responses: 404 NOT FOUND
 
-If there is not journal with given id.
+If there is no journal with given id.
 
 Response:
 ```json
@@ -597,21 +613,159 @@ Response:
     "error": "Unauthorized request"
 }
 ```
+---
 
 ### Comments Endpoints
 
 All comments endpoints are protected and require authorization token with requests.
 
-**Add a comment:** POST /api/comments `Protected`
+**Add a comment:** POST /api/comments `Protected` *Only comments endpoint used in traveling journal app.
 
-*Only comments endpoint used in traveling journal app.
+Required fields: text and journal_id
+
+Request example:
+```json
+{
+    "text": "Hello there!",
+    "journal_id": 1
+}
+```
+
+#### Success Response: 201 CREATED
+
+Header: Location at /api/comments/:comment_id
+
+```json
+{
+        "id": 1,
+        "text":  "Hello there!",
+        "journal_id": 1,
+        "date_created": "2020-02-19 20:00:00",
+        "author": "Obi Ben"
+}
+```
+
+#### Error Responses: 400 BAD REQUEST
+
+Response example for missing one required field:
+```json
+{
+    "error": {
+        "message": "Missing 'text' in request body"
+    }
+}
+```
+
+#### Error Response: 401 UNAUTHORIZED REQUEST
+
+If no authorization token provided.
+
+Response:
+```json
+{
+    "error": "Missing bearer token"
+}
+```
+
+If authorization token is not valid.
+
+Response:
+```json
+{
+    "error": "Unauthorized request"
+}
+```
+
 
 **Get all comments:** GET /api/comments `Protected`
 
-**Get a specific comment by id:** GET /api/comments/:comment_id `Protected`
+#### Success Response: 200 OK
+
+```json
+[
+   {
+        "id": 1,
+        "text": "Ipsum!",
+        "journal_id": 1,
+        "date_created": "2020-02-19 20:00:00",
+        "author": "John Doe"
+   },
+   {
+        "id": 2,
+        "text": "Ipsum dolorium!",
+        "journal_id": 3,
+        "date_created": "2020-02-21 20:00:00",
+        "author": "Luke Sky"
+   },
+   {
+        "id": 3,
+        "text": "Ipsum dolor!",
+        "journal_id": 2,
+        "date_created": "2020-02-22 20:00:00",
+        "author": "Jane Lane"
+   }
+]
+```
+
+#### Error Response: 401 UNAUTHORIZED REQUEST
+
+If no authorization token provided.
+
+Response:
+```json
+{
+    "error": "Missing bearer token"
+}
+```
+
+If authorization token is not valid.
+
+Response:
+```json
+{
+    "error": "Unauthorized request"
+}
+```
 
 
 **Delete a specific comment by id:** DELETE /api/comments/:comment_id `Protected`
+
+URL- :comment_id is the ID of the journal.
+
+#### Success Response: 204 NO CONTENT
+
+#### Error Responses: 404 NOT FOUND
+
+If there is no comment with given id.
+
+Response:
+```json
+{
+    "error": { 
+        "message": "Comment doesn't exist" 
+     }
+}
+```
+
+#### Error Responses: 401 UNAUTHORIZED REQUEST
+
+If no authorization token provided.
+
+Response:
+```json
+{
+    "error": "Missing bearer token"
+}
+```
+
+If authorization token is not valid.
+
+Response:
+```json
+{
+    "error": "Unauthorized request"
+}
+```
 
 ## Technologies Used
 
