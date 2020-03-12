@@ -547,7 +547,7 @@ Response:
 }
 ```
 
-**GET /api/journals/:journal_id/comments Protected)** - Get a specific journal by id and its comments
+**GET /api/journals/:journal_id/comments (Protected)** - Get a specific journal by id and its comments
 
 URL- :journal_id is the ID of the journal.
 
