@@ -20,7 +20,7 @@ Protected Endpoints must have a valid authorization token with the request.
 
 **Login to a user account and get authorization token:** POST /api/auth/login
 
-Required fields: email and password
+**Required fields:** email and password
 
 Request body template:
 ```json
@@ -69,9 +69,7 @@ Response example for missing email or password:
 ```
 
 
-**Refresh an authorization token and get a new token:** POST /api/auth/refresh
-
-Protected endpoint
+**Refresh an authorization token and get a new token:** POST /api/auth/refresh `Protected`
 
 Response example:
 ```json
@@ -83,9 +81,7 @@ Response example:
 
 ### Users Information Endpoints
 
-**Get a user's information:** GET /api/users
-
-Protected endpoint
+**Get a user's information:** GET /api/users `Protected`
 
 #### Success Response: 200 OK
 
@@ -191,9 +187,7 @@ Response example for wrong email format:
 }
 ```
 
-**Get a user's journals:** GET /api/users/journals
-
-Protected endpoint
+**Get a user's journals:** GET /api/users/journals `Protected`
 
 #### Success Response: 200 OK
 
@@ -253,7 +247,7 @@ Response:
 
 All journals endpoints are protected and require authorization token with requests.
 
-**Get all journals:** GET /api/journals
+**Get all journals:** GET /api/journals `Protected`
 
 #### Success Response: 200 OK
 
@@ -311,7 +305,7 @@ Response example:
 ]
 ```
 
-**Add a journal:** POST /api/journals
+**Add a journal:** POST /api/journals `Protected`
 
 Required fields: title, location, content, start_date, end_date
 
@@ -377,33 +371,30 @@ Response:
 ```
 
 
-**Get a specific journal by id:** GET /api/journals/:journal_id
+**Get a specific journal by id:** GET /api/journals/:journal_id `Protected`
 
-**Delete a specific journal by id:** DELETE /api/journals/:journal_id
+**Delete a specific journal by id:** DELETE /api/journals/:journal_id `Protected`
 
-**Edit a specific journal by id:** PATCH /api/journals/:journal_id
+**Edit a specific journal by id:** PATCH /api/journals/:journal_id `Protected`
 
-**Get a specific journal by id and its comments:** GET /api/journals/:journal_id/comments
+**Get a specific journal by id and its comments:** GET /api/journals/:journal_id/comments `Protected`
 
 
 
 ### Comments Endpoints
 
-**Get all comments:**
+All comments endpoints are protected and require authorization token with requests.
 
-GET /api/comments
+**Add a comment:** POST /api/comments `Protected`
 
-**Add a comment:**
+*Only comments endpoint used in traveling journal app.
 
-POST /api/comments
+**Get all comments:** GET /api/comments `Protected`
 
-**Get a specific comment by id:**
+**Get a specific comment by id:** GET /api/comments/:comment_id `Protected`
 
-GET /api/comments/:comment_id
 
-**Delete a specific comment by id:**
-
-DELETE /api/comments/:comment_id
+**Delete a specific comment by id:** DELETE /api/comments/:comment_id `Protected`
 
 ## Technologies Used
 
