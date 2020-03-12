@@ -16,13 +16,65 @@ The Traveling Journal allows users to write about any places they have been and 
 
 ### Authentication Endpoints
 
-**Login to a user account** 
+**Login to a user account and get authorization token:** POST /api/auth/login
 
-POST /api/auth/login
+Request body template:
+```json
+{
+    "email": "valid email address",
+    "password": "valid password"
+}
+```
 
-**Refresh an authorization token:**
+Request body example:
+```json
+{
+    "email": "example@mail.com",
+    "password": "123Abc4!"
+}
+```
 
-POST /api/auth/refresh
+#### Success Response 200 OK
+
+Response example:
+```json
+{
+    "authToken": "893y94hsdjfhaiuiungerlseimg988343y84y37y4r8347brn9834"
+}
+```
+
+#### Error Response 400 BAD REQUEST
+
+Response example for invalid email or password:
+```json
+{
+    "error": "Incorrect email or password"
+}
+```
+
+Response example for missing email or password:
+```json
+{
+    "error": "Missing 'email' in request body"
+}
+```
+```json
+{
+    "error": "Missing 'password' in request body"
+}
+```
+
+
+**Refresh an authorization token and get a new token:** POST /api/auth/refresh
+
+Protected endpoint
+
+Response example:
+```json
+{
+    "authToken": "jfhaiuiu2352svngerlseimg988343y8423fefwe834"
+}
+```
 
 ### Users Information Endpoints
 
