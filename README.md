@@ -373,13 +373,200 @@ Response:
 
 **Get a specific journal by id:** GET /api/journals/:journal_id `Protected`
 
+URL: :journal_id is the ID of the journal.
+
+#### Success Response: 200 OK
+
+Response example:
+```json
+[
+    {
+        "id": 1,
+        "title": "Example Title",
+        "location": "Example Location",
+        "content": "Ipsum ipsum ipsum ipsum ipsum",
+        "start_date": "2019-04-14 20:00:00",
+        "end_date": "2019-04-14 20:00:00",
+        "date_created": "2020-03-11 20:00:00",
+        "date_modified": "2020-03-12 20:00:00",
+        "number_of_comments": 2,
+        "author": "John Doe"
+    }
+]
+```
+#### Error Responses: 404 NOT FOUND
+
+If there is not journal with given id.
+
+Response:
+```json
+{
+    "error": { 
+        "message": "Journal doesn't exist" 
+     }
+}
+```
+
+#### Error Responses: 401 UNAUTHORIZED REQUEST
+
+If no authorization token provided.
+
+Response:
+```json
+{
+    "error": "Missing bearer token"
+}
+```
+
+If authorization token is not valid.
+
+Response:
+```json
+{
+    "error": "Unauthorized request"
+}
+```
+
 **Delete a specific journal by id:** DELETE /api/journals/:journal_id `Protected`
 
-**Edit a specific journal by id:** PATCH /api/journals/:journal_id `Protected`
+URL: :journal_id is the ID of the journal.
+
+#### Success Response: 204 NO CONTENT
+
+#### Error Responses: 404 NOT FOUND
+
+If there is not journal with given id.
+
+Response:
+```json
+{
+    "error": { 
+        "message": "Journal doesn't exist" 
+     }
+}
+```
+
+#### Error Responses: 401 UNAUTHORIZED REQUEST
+
+If no authorization token provided.
+
+Response:
+```json
+{
+    "error": "Missing bearer token"
+}
+```
+
+If authorization token is not valid.
+
+Response:
+```json
+{
+    "error": "Unauthorized request"
+}
+```
+
+**Update specific journal by id:** PATCH /api/journals/:journal_id `Protected`
+
+Required fields: title, location, content, start_date, end_date
+
+Request example:
+```json
+{
+        "title": "Change Example Title",
+        "location": "Change Example Location",
+        "content": "Ipsum ipsum ipsum ipsum ipsum Ipsum ipsum ipsum ipsum ipsum",
+        "start_date": "2019-04-15 20:00:00",
+        "end_date": "2019-04-19 20:00:00"
+}
+```
+
+#### Success Response: 204 NO CONTENT
+
+#### Error Responses: 400 BAD REQUEST
+
+Response example for missing one required field:
+```json
+{
+    "error": {
+        "message": "Missing 'title' in request body"
+    }
+}
+```
+
+#### Error Response: 401 UNAUTHORIZED REQUEST
+
+If no authorization token provided.
+
+Response:
+```json
+{
+    "error": "Missing bearer token"
+}
+```
+
+If authorization token is not valid.
+
+Response:
+```json
+{
+    "error": "Unauthorized request"
+}
+```
 
 **Get a specific journal by id and its comments:** GET /api/journals/:journal_id/comments `Protected`
 
+#### Success Response: 200 OK
 
+```json
+[
+   {
+        id: 1,
+        text: "Ipsum!",
+        journal_id: 1,
+        date_created: "2020-02-19 20:00:00",
+        author: "John Doe"
+   },
+   {
+        id: 3,
+        text: "Ipsum dolor!",
+        journal_id: 1,
+        date_created: "2020-02-22 20:00:00",
+        author: "Jane Lane"
+   }
+]
+```
+
+#### Error Responses: 400 BAD REQUEST
+
+Response example for missing one required field:
+```json
+{
+    "error": {
+        "message": "Missing 'title' in request body"
+    }
+}
+```
+
+#### Error Response: 401 UNAUTHORIZED REQUEST
+
+If no authorization token provided.
+
+Response:
+```json
+{
+    "error": "Missing bearer token"
+}
+```
+
+If authorization token is not valid.
+
+Response:
+```json
+{
+    "error": "Unauthorized request"
+}
+```
 
 ### Comments Endpoints
 
