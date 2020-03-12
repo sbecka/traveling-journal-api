@@ -20,20 +20,20 @@ describe('Comments Endpoints', function () {
   before('cleanup', () => {
     return db.raw(
       `TRUNCATE
-                    traveling_comments,
-                    traveling_journals,
-                    traveling_users
-                    RESTART IDENTITY CASCADE`
+        traveling_comments,
+        traveling_journals,
+        traveling_users
+        RESTART IDENTITY CASCADE`
     );
   });
 
   afterEach('cleanup', () => {
     return db.raw(
       `TRUNCATE
-                    traveling_comments,
-                    traveling_journals,
-                    traveling_users
-                    RESTART IDENTITY CASCADE`
+        traveling_comments,
+        traveling_journals,
+        traveling_users
+        RESTART IDENTITY CASCADE`
     );
   });
 

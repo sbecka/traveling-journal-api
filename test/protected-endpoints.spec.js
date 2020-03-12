@@ -25,20 +25,20 @@ describe('Protected endpoints', function () {
   before('cleanup', () => {
     return db.raw(
       `TRUNCATE
-                    traveling_comments,
-                    traveling_journals,
-                    traveling_users
-                    RESTART IDENTITY CASCADE`
+        traveling_comments,
+        traveling_journals,
+        traveling_users
+        RESTART IDENTITY CASCADE`
     );
   });
 
   afterEach('cleanup', () => {
     return db.raw(
       `TRUNCATE
-                    traveling_comments,
-                    traveling_journals,
-                    traveling_users
-                    RESTART IDENTITY CASCADE`
+        traveling_comments,
+        traveling_journals,
+        traveling_users
+        RESTART IDENTITY CASCADE`
     );
   });
 
@@ -86,11 +86,6 @@ describe('Protected endpoints', function () {
       name: 'POST /api/comments',
       path: '/api/comments',
       method: supertest(app).post
-    },
-    {
-      name: 'DELETE /api/comments',
-      path: '/api/comments',
-      method: supertest(app).delete
     },
     {
       name: 'GET /api/users',

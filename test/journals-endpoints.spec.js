@@ -3,7 +3,7 @@ const knex = require('knex');
 const app = require('../src/app');
 const fixtures = require('./journals.fixtures');
 
-describe.only('Journals Endpoints', function () {
+describe('Journals Endpoints', function () {
   let db;
   const { testUsers, testJournals, testComments } = fixtures.makeJournalsFixtures();
 
@@ -20,20 +20,20 @@ describe.only('Journals Endpoints', function () {
   before('cleanup', () => {
     return db.raw(
       `TRUNCATE
-                    traveling_comments,
-                    traveling_journals,
-                    traveling_users
-                    RESTART IDENTITY CASCADE`
+        traveling_comments,
+        traveling_journals,
+        traveling_users
+        RESTART IDENTITY CASCADE`
     );
   });
 
   afterEach('cleanup', () => {
     return db.raw(
       `TRUNCATE
-                    traveling_comments,
-                    traveling_journals,
-                    traveling_users
-                    RESTART IDENTITY CASCADE`
+        traveling_comments,
+        traveling_journals,
+        traveling_users
+        RESTART IDENTITY CASCADE`
     );
   });
 
@@ -483,7 +483,7 @@ describe.only('Journals Endpoints', function () {
       });
     });
 
-    context.only('Given journal with comments are in database', () => {
+    context('Given journal with comments are in database', () => {
       beforeEach('insert journals', () =>
         fixtures.seedTravelingJournalsTables(
           db,

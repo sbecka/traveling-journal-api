@@ -24,20 +24,20 @@ describe('Auth Endpoints', function () {
   before('cleanup', () => {
     return db.raw(
       `TRUNCATE
-                    traveling_comments,
-                    traveling_journals,
-                    traveling_users
-                    RESTART IDENTITY CASCADE`
+        traveling_comments,
+        traveling_journals,
+        traveling_users
+        RESTART IDENTITY CASCADE`
     );
   });
 
   afterEach('cleanup', () => {
     return db.raw(
       `TRUNCATE
-                    traveling_comments,
-                    traveling_journals,
-                    traveling_users
-                    RESTART IDENTITY CASCADE`
+        traveling_comments,
+        traveling_journals,
+        traveling_users
+        RESTART IDENTITY CASCADE`
     );
   });
 
@@ -95,13 +95,13 @@ describe('Auth Endpoints', function () {
       };
 
       const expectedToken = jwt.sign(
-        { user_id: testUser.id },
-        process.env.JWT_SECRET,
+        { user_id: testUser.id }, // payload
+        process.env.JWT_SECRET, // secret
         {
           subject: testUser.email,
           expiresIn: process.env.JWT_EXPIRY,
           algorithm: 'HS256'
-        }
+        } // config object
       );
 
       return supertest(app)
@@ -113,7 +113,7 @@ describe('Auth Endpoints', function () {
     });
   });
 
-  describe.only('POST /api/auth/refresh', () => {
+  describe('POST /api/auth/refresh', () => {
     beforeEach('insert users', () => {
       fixtures.seedUsers(
         db,
